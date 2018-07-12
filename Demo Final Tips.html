@@ -1,0 +1,890 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+
+
+	<meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<!--<link media="all" rel="stylesheet" type="text/css" href="http://www.tech-recipes.com/wp-content/themes/techrecipes/all.css" />-->
+	<link media="all" rel="stylesheet" type="text/css" href="http://www.tech-recipes.com/wp-content/themes/techrecipes/all.css" />
+
+	<link media="all" rel="stylesheet" type="text/css" href="http://www.tech-recipes.com/wp-content/themes/techrecipes/style.css?t=1509016924">
+	<!-- <link media="all" rel="stylesheet" type="text/css" href="http://www.tech-recipes.com/wp-content/themes/techrecipes/style.css" /> -->
+	<!-- <link media="all" rel="stylesheet" type="text/css" href="http://www.tech-recipes.com/wp-content/themes/techrecipes/slicknav.css" />
+	<script type="text/javascript" async src="http://www.tech-recipes.com/wp-content/themes/techrecipes/js/jquery.slicknav.min.js" ></script> -->
+	
+<meta name="pubdate" content="20150614"/>
+	
+			<link rel="alternate" type="application/rss+xml" title="Tech-Recipes Updates" href="http://feeds.feedburner.com/Tech-RecipesMain" />
+	<style type='text/css'>
+					#sthoverbuttons #sthoverbuttonsMain, .stMainServices {
+						-webkit-box-sizing: content-box !important;
+						-moz-box-sizing:    content-box !important;
+						box-sizing:         content-box !important;
+					}
+				</style><style type='text/css'>
+					.no-break br {
+						display: none !important;
+					}
+			</style><!-- Performance scores of this site is tuned by WP Performance Score Booster plugin v1.4 - http://wordpress.org/plugins/wp-performance-score-booster -->
+
+<!-- This site is optimized with the Yoast SEO plugin v2.3.5 - https://yoast.com/wordpress/plugins/seo/ -->
+<title>Sargable Queries in SQL Server with Examples</title>
+<link rel="canonical" href="http://www.tech-recipes.com/rx/55535/sargable-queries-in-sql-server-with-examples/" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Sargable Queries in SQL Server with Examples" />
+<meta property="og:description" content="The most interesting part of my job is performance tuning and optimization in T-SQL. The heart of performance tuning in an SQL server is proper and usable indexing on tables through the use of Sargable queries. Sometimes, the Senior Database Developer at work tells me just to add an index to an xyz column because &hellip;" />
+<meta property="og:url" content="http://www.tech-recipes.com/rx/55535/sargable-queries-in-sql-server-with-examples/" />
+<meta property="og:site_name" content="Tech-Recipes: A Cookbook Full of Tech Tutorials" />
+<meta property="article:tag" content="performance tuning; sql server; sargable; index seek; index scan; t-sql; query optimization" />
+<meta property="article:section" content="Database" />
+<meta property="article:published_time" content="2015-06-14T22:10:29+00:00" />
+<meta property="article:modified_time" content="2015-06-15T13:26:28+00:00" />
+<meta property="og:updated_time" content="2015-06-15T13:26:28+00:00" />
+<meta property="og:image" content="http://www.tech-recipes.com/wp-content/uploads/2015/05/feature-sql1.jpg" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:description" content="The most interesting part of my job is performance tuning and optimization in T-SQL. The heart of performance tuning in an SQL server is proper and usable indexing on tables through the use of Sargable queries. Sometimes, the Senior Database Developer at work tells me just to add an index to an xyz column because [&hellip;]"/>
+<meta name="twitter:title" content="Sargable Queries in SQL Server with Examples"/>
+<meta name="twitter:domain" content="Tech-Recipes: A Cookbook Full of Tech Tutorials"/>
+<meta name="twitter:image" content="http://www.tech-recipes.com/wp-content/uploads/2015/05/feature-sql1.jpg"/>
+<!-- / Yoast SEO plugin. -->
+
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/www.tech-recipes.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.5.6"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;if(!g||!g.fillText)return!1;switch(g.textBaseline="top",g.font="600 32px Arial",a){case"flag":return g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3;case"diversity":return g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,d=c[0]+","+c[1]+","+c[2]+","+c[3],g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e;case"simple":return g.fillText(h(55357,56835),0,0),0!==g.getImageData(16,16,1,1).data[0];case"unicode8":return g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='slicknavcss-css'  href='http://www.tech-recipes.com/wp-content/plugins/slicknav-mobile-menu/css/slicknav.min.css?ver=1.0.4' type='text/css' media='all' />
+<link rel='stylesheet' id='paginating_css-css'  href='http://www.tech-recipes.com/wp-content/plugins/wp-comment-master/cm.css?ver=4.5.6' type='text/css' media='all' />
+<link rel='stylesheet' id='wpt-twitter-feed-css'  href='http://www.tech-recipes.com/wp-content/plugins/wp-to-twitter/css/twitter-feed.css?ver=4.5.6' type='text/css' media='all' />
+<link rel='stylesheet' id='slidedeck-css'  href='http://www.tech-recipes.com/wp-content/plugins/slidedeck2-personal/css/slidedeck.css?ver=2.3.4' type='text/css' media='screen' />
+<script type="text/javascript">
+window.slideDeck2Version = "2.3.4";
+window.slideDeck2Distribution = "pro";
+</script>
+<link rel='https://api.w.org/' href='http://www.tech-recipes.com/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.tech-recipes.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.tech-recipes.com/wp-includes/wlwmanifest.xml" /> 
+<link rel='shortlink' href='http://www.tech-recipes.com/?p=55535' />
+<link rel="alternate" type="application/json+oembed" href="http://www.tech-recipes.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.tech-recipes.com%2Frx%2F55535%2Fsargable-queries-in-sql-server-with-examples%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://www.tech-recipes.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.tech-recipes.com%2Frx%2F55535%2Fsargable-queries-in-sql-server-with-examples%2F&#038;format=xml" />
+<link rel="stylesheet" type="text/css" media="all" href="http://www.tech-recipes.com/wp-content/plugins/another-author-box/style.css" />
+<script charset="utf-8" type="text/javascript">var switchTo5x=true;</script>
+<script charset="utf-8" type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
+<script charset="utf-8" type="text/javascript">stLight.options({"publisher":"6b0f0076-f37a-4819-891b-9d02123629cc","doNotCopy":true,"hashAddressBar":false,"doNotHash":true});var st_type="wordpress3.9.2";</script>
+<script charset="utf-8" type="text/javascript" src="http://s.sharethis.com/loader.js"></script>
+<script charset="utf-8" type="text/javascript">
+var h_options={ "publisher":"6b0f0076-f37a-4819-891b-9d02123629cc", "position": "left", "chicklets_params": {"twitter":{"st_via":"techrecipes" }, "instagram" :{"st_username":"" } }, "chicklets": { "items": ["facebook", "twitter", "stumbleupon", "reddit", "email"] } }
+;var st_hover_widget = new sharethis.widgets.hoverbuttons(h_options);
+</script>
+      <style>
+            .slicknav_menu {
+                display: none;
+            }
+
+            
+                       
+          @media screen and (max-width: 600px) {
+
+              #nav {
+                  display: none;
+               }
+               .slicknav_menu {
+                  display: block;
+                  background: #4c4c4c;
+               }
+               .slicknav_btn {
+                  background-color:#222222;
+                  float: right;
+               }
+               a.slicknav_open {
+                  background-color:;
+               }
+               .slicknav_nav .slicknav_arrow {
+                  float: right;
+               }
+               .slicknav_menu .slicknav_menutxt {
+                  color: #fff;
+                  text-shadow: 0 1px 3px #000;
+                  font-size: 16px;
+                  font-weight: normal;
+               }
+               .slicknav_menu .slicknav_icon-bar {
+                  background-color: #fff;
+                  box-shadow: 0 1px 0 rgba(0,0,0,0.25);
+               }
+               .slicknav_nav li a {
+                  color: #fff;
+                  text-transform: none ;
+                  font-size: 16px;
+                  padding: 5px 10px;
+               }
+               .slicknav_nav a:hover {
+                  background: #ccc;
+               }
+               .slicknav_nav .slicknav_row:hover{
+                  background: #ccc;
+               }
+               .slicknav_nav input[type="submit"]{
+                  background: #333;
+               }
+           
+             }
+
+        </style>
+<style type="text/css">.broken_link, a.broken_link {
+	text-decoration: line-through;
+}</style>
+<!-- BEGIN GADWP v4.8.2.1 Universal Tracking - https://deconf.com/google-analytics-dashboard-wordpress/ -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-67277128-5', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- END GADWP Universal Tracking -->
+
+
+	<!--[if lt IE 8]>
+	<link rel="stylesheet" type="text/css" href="http://www.tech-recipes.com/wp-content/themes/techrecipes/ie.css" media="screen"/>
+	<![endif]-->
+
+
+<!-- Magnetic tag -->
+<script type="text/javascript">
+      /* Version: 0.3 */
+      /* <![CDATA[ */
+      try {
+      var _mag = _mag || {}; 
+      _mag.kw = '';
+      _mag.shortName = 'tech-recipes';
+      _mag.startTime = (new Date()).getTime();
+      (function(d,t) {
+      var mag = d.createElement('script'); mag.type = 'text/javascript'; mag.async = true; mag.src = t;
+      var head = d.getElementsByTagName('head')[0] || d.documentElement; head.insertBefore(mag, head.firstChild);
+      })(document, '//d3ezl4ajpp2zy8.cloudfront.net/tech-recipes_tag.js');
+      } catch (e) {}
+      /* ]]> */
+</script>
+
+<script type="text/javascript" id="nsgpt" data-channel="general" src="//cdn.nsstatic.net/ns/tech-recipes.com.js" async="true"></script>
+
+
+<!-- GPT -->
+<script async="async" src="https://www.googletagservices.com/tag/js/gpt.js"></script>
+
+<script>
+  var googletag = googletag || {};
+  googletag.cmd = googletag.cmd || [];
+
+  googletag.cmd.push(function() {
+   googletag.pubads().set("adsense_background_color", "FFFFFF");
+  });
+</script>
+
+<script>
+googletag.cmd.push(function() {
+  googletag.defineSlot("/1031089/RRR_Side1", [300, 250], "div-gpt-ad-1520943987173-0")
+    .addService(googletag.pubads());
+    // .setTargeting("interests", ["sports", "music", "movies"]);
+  /* googletag.defineSlot("/1031089/RRR_Side1", [[468, 60], [728, 90], [300, 250]], "div-gpt-ad-1520943987173-1")
+    .addService(googletag.pubads())
+    .setTargeting("gender", "male")
+    .setTargeting("age", "20-30"); */
+  // googletag.pubads().setTargeting("topic","basketball");
+  
+  
+     googletag.pubads().disableInitialLoad();
+	 googletag.pubads().enableSingleRequest();
+	 googletag.enableServices();
+});
+</script>
+
+
+
+<script type='text/javascript'>
+  !function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function(){q("f",arguments)},setDisplayBids:function(){},targetingKeys:function(){return[]},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore(A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
+
+  // initialize apstag and have apstag set bids on the googletag slots when they are returned to the page
+  apstag.init({
+    pubID: 'd0e7c11f-58bb-4ac7-bc04-b5d554dd0f3d',
+    adServer: 'googletag'
+  });
+
+  // request the bids for the four googletag slots
+  apstag.fetchBids({
+    slots: [{
+      slotID: 'div-gpt-ad-1520943987173-0', //example: div-gpt-ad-1475102693815-0
+      slotName: '/1031089/RRR_Side1', //example: //example: /116082170/slot2
+      sizes: [[300, 250]] //example: [[300,250],[300, 600]]
+    }]
+  }, function(bids) {
+    // set apstag bids, then trigger the first request to DFP
+    googletag.cmd.push(function() {
+      apstag.setDisplayBids();
+      googletag.pubads().refresh();    
+    });
+  });
+</script>
+
+
+<script type="text/javascript"> try{(function(){ var cb = new Date().getTime(); var s = document.createElement("script"); s.defer = true; s.src = "//tag.crsspxl.com/s1.js?d=1770&cb="+cb; var s0 = document.getElementsByTagName('script')[0]; s0.parentNode.insertBefore(s, s0); })();}catch(e){} </script>
+
+</head>
+
+<body>
+	<!-- page -->
+	<div id="page">
+		<!-- wrapper -->
+		<div class="lg-hidd">
+			<strong class="logo"><a href="http://www.tech-recipes.com">Tech-Recipes: A Cookbook Full of Tech Tutorials</a></strong>
+		</div>
+
+
+		<div id="wrapper">
+					
+			<!-- wrapper holder -->
+
+
+<!--
+ /1031089/RRR_Side1 
+<div id='div-gpt-ad-1520943987173-0' style='height:250px; width:300px;'>
+
+	<script>
+		googletag.cmd.push(function() { googletag.display('div-gpt-ad-1520943987173-0'); });
+	</script>
+</div>
+-->
+
+<div id="floatingAd">
+     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+     <!-- TechRec-new-header -->
+     <ins class="adsbygoogle"
+         style="display:inline-block;width:970px;height:250px"
+         data-ad-client="ca-pub-6333160765702494"
+         data-ad-slot="5055069802"></ins>
+     <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>    
+</div>
+
+
+<script>
+document.body.onscroll = function(){
+    return;
+    if (document.body.scrollTop > 130 || document.documentElement.scrollTop > 130) {
+      document.getElementById('floatingAd').style.position='fixed';
+      document.getElementById('floatingAd').style.top='0px';
+    }else{
+      document.getElementById('floatingAd').style.position='absolute';
+      document.getElementById('floatingAd').style.top='130px';
+    }
+};
+</script>
+
+			<div class="wrapper-holder">
+				<!-- header -->
+				<div id="header">
+					<div class="header-holder">
+						<!-- logo -->
+						<strong class="logo lg-view"><a href="http://www.tech-recipes.com">Tech-Recipes: A Cookbook Full of Tech Tutorials</a></strong>
+						<div class="header-set">
+							
+							<!-- top navigation -->
+							<ul id="menu-top-menu" class="top-nav"><li id="menu-item-23445" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-23445"><a href="http://www.tech-recipes.com/contact-us/">Contact Us</a></li>
+<li id="menu-item-23446" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-23446"><a href="http://www.tech-recipes.com/about/">About Us</a></li>
+<li id="menu-item-23447" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-23447"><a href="http://www.tech-recipes.com/advertising/">Advertise</a></li>
+</ul>
+							<!-- search form -->
+<form class="search-form" action="http://www.tech-recipes.com/">
+	<fieldset>
+		<input class="btn-search" type="image" src="http://www.tech-recipes.com/wp-content/themes/techrecipes/images/img01.gif" alt="image description" />
+		<input class="text" type="text" name="s" value="search site" />
+	</fieldset>
+</form>
+						</div>
+						
+						<!-- navigation -->
+							
+								<ul id="nav" class=""><li id="menu-item-56111" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-56111"><a href="http://www.tech-recipes.com/rx/category/internet/android/">Android</a></li>
+<li id="menu-item-56112" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-56112"><a href="http://www.tech-recipes.com/rx/category/apple-mac/">Apple</a></li>
+<li id="menu-item-56109" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-56109"><a href="http://www.tech-recipes.com/rx/category/windows/">Windows</a></li>
+<li id="menu-item-56110" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-56110"><a href="http://www.tech-recipes.com/rx/category/internet/">Internet</a></li>
+<li id="menu-item-56115" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor active current-post-parent menu-item-56115"><a href="http://www.tech-recipes.com/rx/category/database/">Database</a></li>
+<li id="menu-item-56114" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-56114"><a href="http://www.tech-recipes.com/rx/category/computer-programming/">Programming</a></li>
+<li id="menu-item-56113" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-56113"><a href="http://www.tech-recipes.com/rx/category/apps/">Apps</a></li>
+</ul>							
+					</div>
+				</div>
+<div style="height: 260px"></div>
+
+<div id="toparticle" style="margin-top:2em;">
+</div>
+<!-- main -->
+<div id="main">
+	<!-- content -->
+	<div id="content">
+					<!-- info box -->
+			<div class="info-box">
+
+<!--
+						
+
+				<script type="text/javascript">
+					e9 = new Object();
+					e9.size = "300x250";
+					var nnn = 'dddddd';
+				</script>
+				<script type="text/javascript" src="//tags.expo9.exponential.com/tags/TechRecipescom/ROS/tags.js"></script>
+			 
+
+
+			<div class="mobile-single-post-banner">
+			<div data-ns="rectangle"></div>
+			</div>
+-->
+				<h1>Sargable Queries in SQL Server with Examples</h1>
+
+
+				<div class="box">
+					
+					<!--<ul class="soc-list">
+						<span class='st_facebook_hcount' st_title='Sargable Queries in SQL Server with Examples' st_url='http://www.tech-recipes.com/rx/55535/sargable-queries-in-sql-server-with-examples/' displayText='like'></span><span class='st_twitter_hcount' st_title='Sargable Queries in SQL Server with Examples' st_url='http://www.tech-recipes.com/rx/55535/sargable-queries-in-sql-server-with-examples/' displayText='share'></span><span class='st_sharethis_hcount' st_title='Sargable Queries in SQL Server with Examples' st_url='http://www.tech-recipes.com/rx/55535/sargable-queries-in-sql-server-with-examples/' displayText='share'></span>		
+					</ul>-->
+					
+					<p>
+					
+					 
+					
+				Posted <span class="posted"> June 14, 2015 </span> by <a href="http://www.tech-recipes.com/rx/author/vishwanath10/">Vishwanath Dalvi<a> in <a class="info" href="http://www.tech-recipes.com/rx/category/database/" title="View all posts in Database" rel="category tag">Database</a>, <a class="info" href="http://www.tech-recipes.com/rx/category/database/sql-server-database/" title="View all posts in SQL Server" rel="category tag">SQL Server</a>, <a class="info" href="http://www.tech-recipes.com/rx/category/uncategorized/" title="View all posts in Uncategorized" rel="category tag">Uncategorized</a>					</p>
+				</div>
+															<div class="illustration">
+							<img width="618" height="350" src="http://www.tech-recipes.com/wp-content/uploads/2015/05/feature-sql1-618x350.jpg" class="attachment-639x350 size-639x350 wp-post-image" alt="feature-sql1" srcset="http://www.tech-recipes.com/wp-content/uploads/2015/05/feature-sql1.jpg 618w, http://www.tech-recipes.com/wp-content/uploads/2015/05/feature-sql1-500x283.jpg 500w, http://www.tech-recipes.com/wp-content/uploads/2015/05/feature-sql1-177x99.jpg 177w" sizes="(max-width: 618px) 100vw, 618px" />						</div>
+													
+				<P>The most interesting part of my job is performance tuning and optimization in T-SQL. The heart of performance tuning in an SQL server is proper and usable indexing on tables through the use of Sargable queries.</P>
+<p><span id="more-55535"></span></p>
+<p>Sometimes, the Senior Database Developer at work tells me just to add an index to an xyz column because it is being used in multiple Where clauses within multiple SQL queries. That is when I need to calm my mind. If adding an index on the xyz column could solve every performance issue, then thousands of books would not have been published on T-SQL performance tuning, and I would have gone hunting for anaconda in the Amazon rainforest.</p>
+<p><strong>Sargable Queries (Search Argumentable)</strong></p>
+<p>In simple terms, Sargable queries are those which are able to use created indexes on them for faster searches and execution of a query.<br />
+A faster search means making an effective index seek out large numbers of rows and avoiding costly index scans.</p>
+<p><strong>Index Seek</strong> &#8211; queries are able to use indexes effectively and locate rows with less effort from the query optimizer.<br />
+<strong>Index Scan</strong> &#8211; scanning the entire table to locate rows to satisfy the search criteria</p>
+<p><strong>What Makes a Query Non-Sargable (not able to use created indexes effectively)?</strong></p>
+<p>1. using functions in Where clause conditions (because a function is evaluated against each row which forces the query optimizer not to use the index)<br />
+2. using LIKE &#8216;%Proposal%&#8217; in Wild card search queries<br />
+3. performing arithmetic calculation on an index column in a Where clause</p>
+<p>Let&#8217;s create and populate a table with 0.1 Million rows to see how to make queries Sargable.</p>
+<p>This script would take time to create sample data based on your hardware configuration (3-5 minutes).</p>
+<p><!-- HTML generated using hilite.me --></p>
+<div style="background: #ffffff; overflow: auto; width: auto; border-width: .1em .1em .1em .8em; padding: .2em .6em;">
+<pre style="margin: 0; line-height: 125%;"><span style="color: #008000;">-- Create a table with primary key</span>
+<span style="color: #0000ff;">CREATE</span> <span style="color: #0000ff;">TABLE</span> EmployeeTest (
+  id INT <span style="color: #0000ff;">IDENTITY</span>(1 ,1) <span style="color: #0000ff;">PRIMARY</span> <span style="color: #0000ff;">KEY</span>,
+  Salary INT,
+  DateOfBirth DATETIME,
+  EmployeeName VARCHAR( 80)
+);
+<span style="color: #0000ff;">GO</span>
+
+<span style="color: #008000;">-- Insert rows with random values</span>
+<span style="color: #0000ff;">DECLARE</span> @<span style="color: #0000ff;">row</span> INT ;
+<span style="color: #0000ff;">DECLARE</span> @string VARCHAR (80), @<span style="color: #0000ff;">length</span> INT, @code INT;
+<span style="color: #0000ff;">SET</span> @<span style="color: #0000ff;">row</span> = 0;
+WHILE @<span style="color: #0000ff;">row</span> &lt; 100000 <span style="color: #0000ff;">BEGIN</span>
+   <span style="color: #0000ff;">SET</span> @<span style="color: #0000ff;">row</span> = @<span style="color: #0000ff;">row</span> + 1;
+
+   IF @<span style="color: #0000ff;">row</span> = 10000
+   PRINT <span style="color: #a31515;">'Rows inserted: '</span>+<span style="color: #0000ff;">CONVERT</span> (VARCHAR( 20),@<span style="color: #0000ff;">row</span> );
+   IF @<span style="color: #0000ff;">row</span> = 20000
+   PRINT <span style="color: #a31515;">'Rows inserted: '</span>+<span style="color: #0000ff;">CONVERT</span> (VARCHAR( 20),@<span style="color: #0000ff;">row</span> );
+   IF @<span style="color: #0000ff;">row</span> = 30000
+   PRINT <span style="color: #a31515;">'Rows inserted: '</span>+<span style="color: #0000ff;">CONVERT</span> (VARCHAR( 20),@<span style="color: #0000ff;">row</span> );
+   IF @<span style="color: #0000ff;">row</span> = 40000
+   PRINT <span style="color: #a31515;">'Rows inserted: '</span>+<span style="color: #0000ff;">CONVERT</span> (VARCHAR( 20),@<span style="color: #0000ff;">row</span> );
+   IF @<span style="color: #0000ff;">row</span> = 50000
+   PRINT <span style="color: #a31515;">'Rows inserted: '</span>+<span style="color: #0000ff;">CONVERT</span> (VARCHAR( 20),@<span style="color: #0000ff;">row</span> );
+   IF @<span style="color: #0000ff;">row</span> = 60000
+   PRINT <span style="color: #a31515;">'Rows inserted: '</span>+<span style="color: #0000ff;">CONVERT</span> (VARCHAR( 20),@<span style="color: #0000ff;">row</span> );
+   IF @<span style="color: #0000ff;">row</span> = 70000
+   PRINT <span style="color: #a31515;">'Rows inserted: '</span>+<span style="color: #0000ff;">CONVERT</span> (VARCHAR( 20),@<span style="color: #0000ff;">row</span> );
+   IF @<span style="color: #0000ff;">row</span> = 80000
+   PRINT <span style="color: #a31515;">'Rows inserted: '</span>+<span style="color: #0000ff;">CONVERT</span> (VARCHAR( 20),@<span style="color: #0000ff;">row</span> );
+   IF @<span style="color: #0000ff;">row</span> = 90000
+   PRINT <span style="color: #a31515;">'Rows inserted: '</span>+<span style="color: #0000ff;">CONVERT</span> (VARCHAR( 20),@<span style="color: #0000ff;">row</span> );
+   IF @<span style="color: #0000ff;">row</span> = 100000
+   PRINT <span style="color: #a31515;">'Done, Rows inserted: '</span>+<span style="color: #0000ff;">CONVERT</span> (VARCHAR( 20),@<span style="color: #0000ff;">row</span> );
+
+   <span style="color: #008000;">-- Build the random string</span>
+   <span style="color: #0000ff;">SET</span> @<span style="color: #0000ff;">length</span> = ROUND (80* RAND(),0 );
+   <span style="color: #0000ff;">SET</span> @string = <span style="color: #a31515;">''</span> ;
+   WHILE @<span style="color: #0000ff;">length</span> &gt; 0 <span style="color: #0000ff;">BEGIN</span>
+      <span style="color: #0000ff;">SET</span> @<span style="color: #0000ff;">length</span> = @<span style="color: #0000ff;">length</span> - 1 ;
+      <span style="color: #0000ff;">SET</span> @code = ROUND( 32*RAND (),0) - 6 ;
+      IF @code <span style="color: #0000ff;">BETWEEN</span> 1 <span style="color: #0000ff;">AND</span> 26
+         <span style="color: #0000ff;">SET</span> @string = @string + CHAR(ASCII (<span style="color: #a31515;">'a'</span>)+ @code-1 );
+      <span style="color: #0000ff;">ELSE</span>
+         <span style="color: #0000ff;">SET</span> @string = @string + <span style="color: #a31515;">' '</span>;
+   <span style="color: #0000ff;">END</span>
+
+   <span style="color: #008000;">-- Ready for the record</span>
+   <span style="color: #0000ff;">SET</span> NOCOUNT <span style="color: #0000ff;">ON</span> ;
+   <span style="color: #0000ff;">INSERT</span> <span style="color: #0000ff;">INTO</span> EmployeeTest <span style="color: #0000ff;">VALUES</span> (
+      ROUND(2000000 *RAND()+ 10000,0 ),     
+      <span style="color: #0000ff;">CONVERT</span>(DATETIME , ROUND (60000* RAND()-30000 ,9)),
+      @string
+   )
+
+<span style="color: #0000ff;">END</span>
+<span style="color: #0000ff;">GO</span>
+</pre>
+</div>
+<p><strong>Let&#8217;s create a Non-clustered index on every column.</strong></p>
+<p><!-- HTML generated using hilite.me --></p>
+<div style="background: #ffffff; overflow: auto; width: auto; border-width: .1em .1em .1em .8em; padding: .2em .6em;">
+<pre style="margin: 0; line-height: 125%;"><span style="color: #0000ff;">CREATE</span> NONCLUSTERED <span style="color: #0000ff;">INDEX</span> [NCI_EmployeeTest_Salary] <span style="color: #0000ff;">ON</span> [dbo]. [EmployeeTest]
+(
+       [Salary] <span style="color: #0000ff;">ASC</span>
+)
+<span style="color: #0000ff;">GO</span>
+
+<span style="color: #0000ff;">CREATE</span> NONCLUSTERED <span style="color: #0000ff;">INDEX</span> [NCI_EmployeeTest_DateOfBirth] <span style="color: #0000ff;">ON</span> [dbo]. [EmployeeTest]
+(
+       [DateOfBirth] <span style="color: #0000ff;">ASC</span>
+)
+<span style="color: #0000ff;">GO</span>
+
+<span style="color: #0000ff;">CREATE</span> NONCLUSTERED <span style="color: #0000ff;">INDEX</span> [NCI_EmployeeTest_EmployeeName] <span style="color: #0000ff;">ON</span> [dbo]. [EmployeeTest]
+(
+       [EmployeeName] <span style="color: #0000ff;">ASC</span>
+)
+<span style="color: #0000ff;">GO</span>
+</pre>
+</div>
+<p>Let&#8217;s see some samples queries to see the difference between sargable and non-sargable queries.</p>
+<p><strong>1. Filtering the Result Based On the Employee Names Which Start with A</strong><br />
+<!-- HTML generated using hilite.me --></p>
+<div style="background: #ffffff; overflow: auto; width: auto; border-width: .1em .1em .1em .8em; padding: .2em .6em;">
+<pre style="margin: 0; line-height: 125%;"><span style="color: #0000ff;">SET</span> <span style="color: #0000ff;">STATISTICS</span> IO <span style="color: #0000ff;">ON</span>
+
+<span style="color: #008000;">--Non-Sargable Query because of Function Used in Where Clause</span>
+<span style="color: #0000ff;">SELECT</span> EmployeeName
+<span style="color: #0000ff;">FROM</span>  EmployeeTest
+<span style="color: #0000ff;">WHERE</span> <span style="color: #0000ff;">LEFT</span>( EmployeeName,1 ) = <span style="color: #a31515;">'A'</span>;
+
+<span style="color: #008000;">--Sargable Query</span>
+<span style="color: #0000ff;">SELECT</span> EmployeeName
+<span style="color: #0000ff;">FROM</span>  EmployeeTest
+<span style="color: #0000ff;">WHERE</span> EmployeeName <span style="color: #0000ff;">LIKE</span> <span style="color: #a31515;">'A%'</span>;
+
+<span style="color: #0000ff;">SET</span> <span style="color: #0000ff;">STATISTICS</span> IO <span style="color: #0000ff;">OFF</span>
+</pre>
+</div>
+<p>The statistics below show the first non-sargable query took 680 logical reads, whereas the sargable query with a wild card search did only 25 logical reads.</p>
+<pre><code>(3115 row(s) affected)
+Table 'EmployeeTest'. Scan count 1, <strong>logical reads 680</strong>, physical reads 1, 
+read-ahead reads 688, lob logical reads 0, lob physical reads 0, lob read-ahead reads 0.
+
+(3115 row(s) affected)
+Table 'EmployeeTest'. Scan count 1, <strong>logical reads 25</strong>, physical reads 0, 
+read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob read-ahead reads 0.</code></pre>
+<p>The execution plans below show the first Non-Sargable query takes<strong> 97% cost</strong>, whereas the Sargable query takes <strong> 3% with Index Seek</strong>.</p>
+<p><img class="aligncenter size-full wp-image-55545" src="http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_1.png" alt="Execution_Plan_Sargable_1" width="603" height="335" srcset="http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_1.png 603w, http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_1-500x278.png 500w, http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_1-177x99.png 177w" sizes="(max-width: 603px) 100vw, 603px" /></p>
+<p><strong>2. Filtering Results for Specific a Year</strong></p>
+<p><!-- HTML generated using hilite.me --></p>
+<div style="background: #ffffff; overflow: auto; width: auto; border-width: .1em .1em .1em .8em; padding: .2em .6em;">
+<pre style="margin: 0; line-height: 125%;"><span style="color: #0000ff;">SET</span> <span style="color: #0000ff;">STATISTICS</span> IO <span style="color: #0000ff;">ON</span>
+
+<span style="color: #008000;">--Non-Sargable Query because of Function Used in Where Clause</span>
+<span style="color: #0000ff;">SELECT</span> DateOfBirth
+<span style="color: #0000ff;">FROM</span>  EmployeeTest
+<span style="color: #0000ff;">WHERE</span> <span style="color: #0000ff;">YEAR</span> (DateOfBirth) = <span style="color: #a31515;">'1952'</span>;
+
+<span style="color: #008000;">--Sargable Query</span>
+<span style="color: #0000ff;">SELECT</span> DateOfBirth
+<span style="color: #0000ff;">FROM</span>  EmployeeTest
+<span style="color: #0000ff;">WHERE</span> DateOfBirth &gt;= <span style="color: #a31515;">'19520101'</span> <span style="color: #0000ff;">AND</span> DateOfBirth &lt; '19530101';
+
+<span style="color: #0000ff;">SET</span> <span style="color: #0000ff;">STATISTICS</span> IO <span style="color: #0000ff;">OFF</span>
+</pre>
+</div>
+<p>The statistics below show the first non-Sargable query took 226 logical reads, whereas the Sargable query completed only four logical reads.</p>
+<pre><code>(628 row(s) affected)
+Table 'EmployeeTest'. Scan count 1, <strong>logical reads 226</strong>, physical reads 0, 
+read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob read-ahead reads 0.
+
+(628 row(s) affected)
+Table 'EmployeeTest'. Scan count 1, <strong>logical reads 4</strong>, physical reads 0,
+ read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob read-ahead reads 0.</code></pre>
+<p>The Execution Plans below show the first Non-Sargable query takes <strong>98% Batch cost</strong> with Index Scan, whereas the Sargable query takes <strong>2% with Index Seek</strong>.</p>
+<p><img class="aligncenter size-full wp-image-55561" src="http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_2.png" alt="Execution_Plan_Sargable_2" width="710" height="316" srcset="http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_2.png 710w, http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_2-500x223.png 500w, http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_2-620x276.png 620w" sizes="(max-width: 710px) 100vw, 710px" /><br />
+<strong>3. Calculations on an Index Column in a Where Clause</strong></p>
+<p><!-- HTML generated using hilite.me --></p>
+<div style="background: #ffffff; overflow: auto; width: auto; border-width: .1em .1em .1em .8em; padding: .2em .6em;">
+<pre style="margin: 0; line-height: 125%;"><span style="color: #0000ff;">SET</span> <span style="color: #0000ff;">STATISTICS</span> IO <span style="color: #0000ff;">ON</span>
+
+<span style="color: #008000;">--Non-Sargable Query because of Calculation done on Index Column</span>
+<span style="color: #008000;">--in Where Clause</span>
+
+<span style="color: #0000ff;">SELECT</span> Salary
+<span style="color: #0000ff;">FROM</span>  EmployeeTest
+<span style="color: #0000ff;">WHERE</span> Salary / 2 = 50147 ;
+
+<span style="color: #008000;">--Sargable Query</span>
+
+<span style="color: #0000ff;">SELECT</span> Salary
+<span style="color: #0000ff;">FROM</span>  EmployeeTest
+<span style="color: #0000ff;">WHERE</span> Salary  = (50147 * 2);
+
+<span style="color: #0000ff;">SET</span> <span style="color: #0000ff;">STATISTICS</span> IO <span style="color: #0000ff;">OFF</span>
+</pre>
+</div>
+<p>The statistics below show the first non-sargable query took 178 logical reads, whereas the sargable query completed only two logical reads.</p>
+<pre><code>(3 row(s) affected)
+Table 'EmployeeTest'. Scan count 1, <strong>logical reads 178</strong>, physical reads 0,
+ read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob read-ahead reads 0.
+
+(3 row(s) affected)
+Table 'EmployeeTest'. Scan count 1, <strong>logical reads 2</strong>, physical reads 0, 
+read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob read-ahead reads 0.</code></pre>
+<p>The execution plans below show the first Non-sargable query takes <strong>99% Batch cost with Index Scan</strong>, whereas the Sargable query takes <strong>1% with Index Seek</strong>.</p>
+<p><img class="aligncenter size-full wp-image-55563" src="http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_3.png" alt="Execution_Plan_Sargable_3" width="602" height="325" srcset="http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_3.png 602w, http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_3-500x270.png 500w" sizes="(max-width: 602px) 100vw, 602px" /></p>
+<p><strong>4. Using the ISNULL Function in a Where Clause</strong></p>
+<p><!-- HTML generated using hilite.me --></p>
+<div style="background: #ffffff; overflow: auto; width: auto; border-width: .1em .1em .1em .8em; padding: .2em .6em;">
+<pre style="margin: 0; line-height: 125%;"><span style="color: #0000ff;">SET</span> <span style="color: #0000ff;">STATISTICS</span> IO <span style="color: #0000ff;">ON</span>
+
+<span style="color: #008000;">--Non-Sargable Query because of ISNULL function on Index Column</span>
+<span style="color: #008000;">--in Where Clause</span>
+
+<span style="color: #0000ff;">select</span> EmployeeName
+<span style="color: #0000ff;">FROM</span>   EmployeeTest
+<span style="color: #0000ff;">where</span>  <span style="color: #0000ff;">ISNULL</span> (EmployeeName, <span style="color: #a31515;">'Vru'</span>) = <span style="color: #a31515;">'Vru'</span> ;
+
+<span style="color: #008000;">--Sargable Query</span>
+
+<span style="color: #0000ff;">select</span> EmployeeName
+<span style="color: #0000ff;">FROM</span>   EmployeeTest
+<span style="color: #0000ff;">where</span>  EmployeeName = <span style="color: #a31515;">'Vru'</span> <span style="color: #0000ff;">OR</span> EmployeeName <span style="color: #0000ff;">IS</span> <span style="color: #0000ff;">NULL</span>;
+
+<span style="color: #0000ff;">SET</span> <span style="color: #0000ff;">STATISTICS</span> IO <span style="color: #0000ff;">OFF</span>
+</pre>
+</div>
+<p>The statistics below show the first non-sargable query took 680 logical reads, whereas the sargable query completed only six logical reads.</p>
+<pre><code>(1 row(s) affected)
+Table 'EmployeeTest'. Scan count 1, <strong>logical reads 680</strong>, physical reads 0,
+ read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob read-ahead reads 0.
+
+(1 row(s) affected)
+Table 'EmployeeTest'. Scan count 2, <strong>logical reads 6</strong>, physical reads 0, 
+read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob read-ahead reads 0.</code></pre>
+<p>The execution plans below show the first Non-sargable query takes <strong>99% Batch cost with Index Scan</strong>, whereas the Sargable query takes<strong> 1% with Index Seek</strong>.</p>
+<p><img class="aligncenter size-full wp-image-55564" src="http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_4.png" alt="Execution_Plan_Sargable_4" width="726" height="458" srcset="http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_4.png 726w, http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_4-500x315.png 500w, http://www.tech-recipes.com/wp-content/uploads/2015/06/Execution_Plan_Sargable_4-620x391.png 620w" sizes="(max-width: 726px) 100vw, 726px" /></p>
+							</div>
+		
+
+<div style="width:970px; margin: auto;">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:250px"
+     data-ad-client="ca-pub-6333160765702494"
+     data-ad-slot="1451313821"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+			<!-- about box -->
+		<div class="about-box">
+				<div class="person-info">
+					<div class="clear">&nbsp;</div>
+					<h3><a href="http://www.tech-recipes.com/rx/author/vishwanath10/">About Vishwanath Dalvi</a></h3>
+					<div class="person-holder">
+						
+						<div class="illustration">
+														<a href="http://www.tech-recipes.com/rx/author/vishwanath10/"><img alt='' src='http://2.gravatar.com/avatar/5b1140708fab49c1b1ee3fe96429b9c5?s=73&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/5b1140708fab49c1b1ee3fe96429b9c5?s=146&amp;d=mm&amp;r=g 2x' class='avatar avatar-73 photo' height='73' width='73' /></a>
+							
+						</div>
+						
+						<div class="description">
+							Vishwanath Dalvi is a gifted engineer and tech enthusiast. He enjoys music, magic, movies, and gaming. When not hacking around or supporting the open source community, he is trying to overcome his phobia of dogs.<br />
+							<a href="http://www.tech-recipes.com/rx/author/vishwanath10/" class="viewmore">View more articles by Vishwanath Dalvi</a>
+						</div>
+					</div>
+				</div>
+			</div>
+	
+			<!-- share block -->
+			<div class="share-block">
+				<a href="#" class="share">Share this article</a>
+					<p>If this article helped you, please THANK the author by sharing.  Your participation helps us to help others.</p>				
+								<div class="share-btns">
+								<ul class="soc-list">
+								<span class='st_facebook_buttons' st_title='Sargable Queries in SQL Server with Examples' st_url='http://www.tech-recipes.com/rx/55535/sargable-queries-in-sql-server-with-examples/' displayText='share'></span><span class='st_twitter_buttons' st_title='Sargable Queries in SQL Server with Examples' st_url='http://www.tech-recipes.com/rx/55535/sargable-queries-in-sql-server-with-examples/' displayText='share'></span><span class='st_linkedin_button' st_title='Sargable Queries in SQL Server with Examples' st_url='http://www.tech-recipes.com/rx/55535/sargable-queries-in-sql-server-with-examples/' displayText='share'></span><span class='st_plusone_button' st_title='Sargable Queries in SQL Server with Examples' st_url='http://www.tech-recipes.com/rx/55535/sargable-queries-in-sql-server-with-examples/' displayText='share'></span>
+								
+							</ul>
+							</div>
+			</div>
+			
+			<div id="precoms" style="margin:auto;width:625px;display:block; height:0px; ">
+			</div>
+			
+			
+		
+		<div class="widget widget_text footer-section" id="text-27 ">					</div>	
+		<!-- conversation block -->
+		<div class="conversation-block">
+			<h4>The Conversation</h4>
+			<p>Follow the reactions below and share your own thoughts.</p>
+
+			
+
+			<!-- If comments are open, but there are no comments. -->
+
+	 	
+
+
+
+<div class="section respond" id="respond">
+	<form action="http://www.tech-recipes.com/wp-comments-post.php" method="post" id="commentform">
+		<fieldset>
+			<h2>Leave a Reply</h2>
+	
+			<div class="cancel-comment-reply"><a rel="nofollow" id="cancel-comment-reply-link" href="/rx/55535/sargable-queries-in-sql-server-with-examples/#respond" style="display:none;">Click here to cancel reply.</a></div>
+		
+						
+						
+			<dl>
+				<dt><label for="author">Name</label></dt>
+				<dd><input type="text" name="author" id="author" value="" /></dd>
+				<dt><label for="email">E-Mail (will not be published)</label></dt>
+				<dd><input type="text" name="email" id="email" value="" /></dd>
+				<dt><label for="url">Website</label></dt>
+				<dd><input type="text" name="url" id="url" value="" /></dd>
+							<dt><label for="comment">Comment</label></dt>
+				<dd><textarea name="comment" id="comment" cols="50" rows="10"></textarea></dd>
+				<dd><button type="submit" class="button">Submit Comment</button></dd>
+			</dl>
+			
+			<input type='hidden' name='comment_post_ID' value='55535' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+			
+			
+		</fieldset>
+	</form>
+</div>
+
+                        <div data-ns="native" data-sharethrough="msbycGkkcp36jiYJBJT4VsuZ"></div>
+		</div>
+	</div>
+	<!-- sidebar -->
+<div id="sidebar">
+	<div class="widget widget_text" id="text-2">			<!-- social networks wid=3 -->
+<ul class="social-networks">
+<li><a class="facebook" href="http://www.facebook.com/pages/Tech-Recipes/14409670351">facebook</a></li>
+<li><a class="twitter" href="https://twitter.com/#!/techrecipes">twitter</a></li>
+<li><a class="linkedin" href="http://www.linkedin.com/company/2620450">linkedin</a></li>
+</ul>		</div><div class="widget widget_text" id="text-28">			<!-- amazon 600x300 passback adsense  -->
+<script type="text/javascript" language="javascript" src="//c.amazon-adsystem.com/aax2/getads.js"></script>
+<script type="text/javascript" language="javascript">
+  //<![CDATA[
+    aax_getad_mpb({
+      "slot_uuid":"261dce25-d711-4387-82fd-57441304870e"
+    });
+  //]]>
+</script>
+		</div><div class="widget widget_text" id="text-5">			<div class="heading">
+<span>Related Tutorials</span>
+<ul>
+<li>
+<a href="http://www.tech-recipes.com/rx/57709/use-multiple-clash-of-clans-accounts-on-your-iphone/">Use Multiple Clash of Clans Accounts on your iPhone</a>
+</li>
+</ul>
+</div>
+
+<div id="toprightcornerad"  style="text-align:center;margin-bottom:1em" >
+
+<!-- zd 300x600 passback adsense -->
+<div data-ns="halfpage"></div>
+
+</div>		</div><div class="widget widget-about" id="post_customfield-2">  
+			 
+  </div><div class="widget widget_text" id="text-29">			<!-- tf passback adsense -->
+<script type="text/javascript"><!--
+	e9 = new Object();
+    e9.size = "300x250,300x600";
+//--></script>
+<script type="text/javascript" src="//tags.expo9.exponential.com/tags/TechRecipescom/ROS/tags.js"></script>
+
+
+<!-- 300x600 SIDEBAR -->
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- techRecipes 300x600 -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:300px;height:600px"
+     data-ad-client="ca-pub-6333160765702494"
+     data-ad-slot="6480455516"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>		</div><div class="widget widget_text" id="text-14">			<!-- tf passback adsense -->
+<script type="text/javascript"><!--
+	e9 = new Object();
+    e9.size = "300x250,300x600";
+//--></script>
+<script type="text/javascript" src="//tags.expo9.exponential.com/tags/TechRecipescom/ROS/tags.js"></script>		</div><div class="widget widget_text" id="text-30">			<!--
+<script type="text/javascript">
+    kmn_placement = 'f8fa2afb252d6749d5fbb714c90bc832';
+</script>
+<script type="text/javascript" src="//cdn.komoona.com/scripts/kmn_sa.js"></script>
+-->
+
+<div id="kmni_5538cfa1ff764dc313a60bb8b8594e2f"></div>
+<script type="text/javascript" src="//cdn.komoona.com/scripts/kmn_sa.js" async></script>
+<script type="text/javascript">
+    var kmn_tags = window.kmn_tags || [];
+    kmn_tags.push('5538cfa1ff764dc313a60bb8b8594e2f');
+</script>		</div><div class="widget widget_text" id="text-31">			<script type="text/javascript"><!--
+	e9 = new Object();
+    e9.size = "300x250,300x600";
+//--></script>
+<script type="text/javascript" src="//tags.expo9.exponential.com/tags/TechRecipescom/ROS/tags.js"></script>
+
+		</div></div>
+</div>
+<!-- footer -->
+				<div id="footer">
+					<div class="section-holder">
+						<div class="widget widget_nav_menu footer-section" id="nav_menu-2 "><h3>Apple</h3><div class="menu-apple-menu-container"><ul id="menu-apple-menu" class="menu"><li id="menu-item-23442" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23442"><a href="http://www.tech-recipes.com/rx/category/apple-mac/">Mac</a></li>
+<li id="menu-item-23443" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23443"><a href="http://www.tech-recipes.com/rx/category/apple-mac/apple-iphone/">iPhone</a></li>
+</ul></div></div><div class="widget widget_nav_menu footer-section" id="nav_menu-3 "><h3>Programming</h3><div class="menu-programming-menu-container"><ul id="menu-programming-menu" class="menu"><li id="menu-item-23458" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23458"><a href="http://www.tech-recipes.com/rx/category/computer-programming/">Computer programming</a></li>
+<li id="menu-item-23459" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23459"><a href="http://www.tech-recipes.com/rx/category/computer-programming/c-programming/">C programming</a></li>
+<li id="menu-item-23460" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23460"><a href="http://www.tech-recipes.com/rx/category/computer-programming/hardware/">Hardware</a></li>
+<li id="menu-item-23461" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23461"><a href="http://www.tech-recipes.com/rx/category/computer-programming/java-programming/">Java programming</a></li>
+<li id="menu-item-23462" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23462"><a href="http://www.tech-recipes.com/rx/category/internet/html/">HTML</a></li>
+<li id="menu-item-23463" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23463"><a href="http://www.tech-recipes.com/rx/category/internet/http/">HTTP</a></li>
+<li id="menu-item-23464" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23464"><a href="http://www.tech-recipes.com/rx/category/internet/http/apache-web-server/">Apache web server</a></li>
+<li id="menu-item-23465" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23465"><a href="http://www.tech-recipes.com/rx/category/computer-programming/web-application-programming/asp-net-programming/">ASP NET Programming</a></li>
+<li id="menu-item-23466" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23466"><a href="http://www.tech-recipes.com/rx/category/computer-programming/web-application-programming/jsp-programming/">JSP programming</a></li>
+<li id="menu-item-23467" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23467"><a href="http://www.tech-recipes.com/rx/category/unix/unix-shell/bash-shell/">BASH shell</a></li>
+<li id="menu-item-23468" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23468"><a href="http://www.tech-recipes.com/rx/category/unix/unix-shell/bourne-shell/">Bourne shell</a></li>
+<li id="menu-item-23469" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23469"><a href="http://www.tech-recipes.com/rx/category/unix/unix-shell/korn-shell/">Korn shell</a></li>
+<li id="menu-item-23470" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23470"><a href="http://www.tech-recipes.com/rx/category/windows/batch-file-programming/">Batch file programming</a></li>
+<li id="menu-item-23471" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23471"><a href="http://www.tech-recipes.com/rx/category/computer-programming/unix-shell-scripting/bourne-shell-scripting/">Bourne shell scripting</a></li>
+<li id="menu-item-23472" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23472"><a href="http://www.tech-recipes.com/rx/category/computer-programming/unix-shell-scripting/csh-shell-scripting/">csh shell scripting</a></li>
+</ul></div></div><div class="widget widget_nav_menu footer-section" id="nav_menu-4 "><h3>Database</h3><div class="menu-database-menu-container"><ul id="menu-database-menu" class="menu"><li id="menu-item-23455" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23455"><a href="http://www.tech-recipes.com/rx/category/database/mysql/">MySQL</a></li>
+<li id="menu-item-23456" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23456"><a href="http://www.tech-recipes.com/rx/category/database/oracle/">Oracle</a></li>
+<li id="menu-item-23457" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23457"><a href="http://www.tech-recipes.com/rx/category/database/postgresql-pgsql/">PostgreSQL PgSQL</a></li>
+</ul></div></div><div class="widget widget_nav_menu footer-section" id="nav_menu-5 "><h3>Networking</h3><div class="menu-networking-menu-3-container"><ul id="menu-networking-menu-3" class="menu"><li id="menu-item-23473" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23473"><a href="http://www.tech-recipes.com/rx/category/apple-mac/mac-networking/">Mac networking</a></li>
+<li id="menu-item-23474" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23474"><a href="http://www.tech-recipes.com/rx/category/networking/cisco-networking/cisco-call-manager/">Cisco call manager</a></li>
+<li id="menu-item-23475" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23475"><a href="http://www.tech-recipes.com/rx/category/networking/cisco-networking/cisco-firewall/">Cisco firewall</a></li>
+<li id="menu-item-23476" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23476"><a href="http://www.tech-recipes.com/rx/category/networking/cisco-networking/cisco-router/">Cisco router</a></li>
+<li id="menu-item-23477" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23477"><a href="http://www.tech-recipes.com/rx/category/networking/cisco-networking/cisco-switch/">Cisco switch</a></li>
+<li id="menu-item-23478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23478"><a href="http://www.tech-recipes.com/rx/category/networking/cisco-networking/">Cisco networking</a></li>
+<li id="menu-item-23479" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23479"><a href="http://www.tech-recipes.com/rx/category/networking/juniper-networking/">Juniper Networking</a></li>
+<li id="menu-item-23480" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23480"><a href="http://www.tech-recipes.com/rx/category/unix/linux/linux-networking/">Linux networking</a></li>
+</ul></div></div><div class="widget widget_nav_menu footer-section" id="nav_menu-6 "><h3>Internet</h3></div><div class="widget widget_nav_menu footer-section" id="nav_menu-7 "><h3>Windows</h3><div class="menu-windows-menu-container"><ul id="menu-windows-menu" class="menu"><li id="menu-item-23481" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23481"><a href="http://www.tech-recipes.com/rx/category/windows/">Windows</a></li>
+<li id="menu-item-23482" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23482"><a href="http://www.tech-recipes.com/rx/category/windows/microsoft-vista/">Microsoft Vista</a></li>
+<li id="menu-item-23483" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23483"><a href="http://www.tech-recipes.com/rx/category/windows/windows7/">Windows 7</a></li>
+<li id="menu-item-23485" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23485"><a href="http://www.tech-recipes.com/rx/category/windows/windows-8-windows/">Windows 8</a></li>
+<li id="menu-item-23486" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23486"><a href="http://www.tech-recipes.com/rx/category/windows/windows-installation/">Windows installation</a></li>
+<li id="menu-item-23487" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23487"><a href="http://www.tech-recipes.com/rx/category/windows/windows-security/">Windows security</a></li>
+</ul></div></div>
+						<div id="lastdiv" class="pull-right footer-ad">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- TechRec-footer -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:250px"
+     data-ad-client="ca-pub-6333160765702494"
+     data-ad-slot="5131091422"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+<div data-ns="billboard"></div>
+
+  						</div>
+						
+					</div>
+					<!-- footer set -->
+					<div class="footer-set">
+						<!-- footer section -->
+						<strong class="logo"><a href="#">Tech-Recipes</a></strong>
+						<div class="footer-info">
+							<p>By visiting this site, users agree to <a href="http://www.tech-recipes.com/disclaimer/">our disclaimer</a>. The members, admins, and authors of this website respect <a href="http://www.tech-recipes.com/tech-recipes-privacy-policy/">your privacy.</a></p>
+							<p>All logos and trademarks in this site are property of their respective owner.<br/> The comments and forum posts are property of their posters, all the rest &reg; 2003-2015 by QD Ideas, LLC.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<script type="text/javascript">
+var slideDeck2URLPath = "http://www.tech-recipes.com/wp-content/plugins/slidedeck2-personal";
+var slideDeck2AddonsURL = "http://www.tech-recipes.com/wp-admin/admin.php?page=slidedeck2.php/upgrades";
+var slideDeck2iframeByDefault = true;
+</script>
+<script type='text/javascript'>/* <![CDATA[ */
+var phpVars = {"ng_slicknav":{"ng_slicknav_menu":"#nav","ng_slicknav_position":"body","ng_slicknav_parent_links":true,"ng_slicknav_child_links":false,"ng_slicknav_speed":400,"ng_slicknav_label":"MENU","ng_slicknav_fixhead":false,"ng_slicknav_brand":"http:\/\/www.tech-recipes.com\/wp-content\/themes\/techrecipes\/images\/logo-small.png","ng_slicknav_search":false,"ng_slicksearch":"http:\/\/www.tech-recipes.com\/","ng_slicknav_closedsymbol":"\u25ba","ng_slicknav_openedsymbol":"\u25bc","ng_slicknav_alt":""}};
+var yjlSettings = {"pagination":"","comPerpage":"","numPerpage":"","pagerPos":"","repForm":"","gifUrl":"http:\/\/www.tech-recipes.com\/wp-content\/plugins\/wp-comment-master\/ajax-loader.gif","prev":"","next":"","timeOut":"","fast":"","thank":"","order":"asc","autoGrow":""};
+(function(g,b,d){var c=b.head||b.getElementsByTagName("head"),D="readyState",E="onreadystatechange",F="DOMContentLoaded",G="addEventListener",H=setTimeout;function f(){$LAB.script("http://www.tech-recipes.com/wp-content/themes/techrecipes/js/comment-reply.js").script("http://www.tech-recipes.com/wp-includes/js/jquery/jquery.js").wait().script("http://www.tech-recipes.com/wp-includes/js/jquery/jquery-migrate.min.js").wait().script("http://www.tech-recipes.com/wp-content/plugins/slicknav-mobile-menu/js/jquery.slicknav.min.js").wait().script("http://www.tech-recipes.com/wp-content/plugins/slicknav-mobile-menu/js/slick-init.js").script("http://www.tech-recipes.com/wp-content/plugins/slidedeck2-personal/js/jquery-mousewheel/jquery.mousewheel.min.js").script("http://www.tech-recipes.com/wp-content/plugins/slidedeck2-personal/js/jquery.easing.1.3.js").script("http://www.tech-recipes.com/wp-content/plugins/slidedeck2-personal/js/slidedeck.jquery.js").wait().script("http://www.tech-recipes.com/wp-content/plugins/slidedeck2-personal/js/slidedeck-public.js").script("http://platform.twitter.com/widgets.js").script("http://www.tech-recipes.com/wp-content/plugins/wp-comment-master/autoresize.jquery.min.js").script("http://www.tech-recipes.com/wp-content/plugins/wp-comment-master/cm.js").script("http://www.tech-recipes.com/wp-includes/js/wp-embed.min.js");}H(function(){if("item"in c){if(!c[0]){H(arguments.callee,25);return}c=c[0]}var a=b.createElement("script"),e=false;a.onload=a[E]=function(){if((a[D]&&a[D]!=="complete"&&a[D]!=="loaded")||e){return false}a.onload=a[E]=null;e=true;f()};a.src="http://www.tech-recipes.com/wp-content/plugins/wp-deferred-javascripts/assets/js/lab.min.js?ver=2.0.3";c.insertBefore(a,c.firstChild)},0);if(b[D]==null&&b[G]){b[D]="loading";b[G](F,d=function(){b.removeEventListener(F,d,false);b[D]="complete"},false)}})(this,document);
+/* ]]> */</script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+
+<!-- Java Scripts moved from Header-->
+<script type="text/javascript" async src="http://www.tech-recipes.com/wp-content/themes/techrecipes/js/main.js" ></script>
+<script type="text/javascript" async src="http://www.tech-recipes.com/wp-content/themes/techrecipes/js/plugin.js" ></script>
+
+
+<!-- Snackbar -->
+<div class="snackbar">
+<script type="text/javascript"><!--
+e9 = new Object();
+e9.snackbar = true;
+//--></script>
+<script type="text/javascript" src="http://tags.expo9.exponential.com/tags/TechRecipescom/Snackbar/tags.js"></script>
+</div>
+
+<!-- Netshelter sticky ad def. -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script type="text/javascript" async src="http://aws-ajax.com/tech-r.master.js"></script>
+<script>
+(function(){
+var s = new Image();
+s.src='//tag.crsspxl.com/he.gif?d=1770&cb=' + Math.random();
+})();
+</script>
+<script type="text/javascript">
+window.ZDStickyOpts = function() {
+  return {
+  	topLeaderboardAdContainer: '#toparticle',
+  	sidebarTopAdContainer: '',
+  	sidebarBottomAdContainer: '',
+  	pageContent: '',
+  	fixedNavBar: '',
+      extraCSS: ''
+  }
+}
+</script>
+<script type="text/javascript" src="http://cdn.ziffstatic.com/jst/zdsticky.rel.js?v=1" async="async"></script>
+
+</body>
+</html>

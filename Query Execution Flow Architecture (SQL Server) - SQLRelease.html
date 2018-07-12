@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<!--[if IE 7]><html
+class="ie ie7 no-js" lang="en-US" prefix="og: http://ogp.me/ns#">
+<![endif]-->
+<!--[if IE 8]><html
+class="ie ie8 no-js" lang="en-US" prefix="og: http://ogp.me/ns#">
+<![endif]-->
+<!--[if !(IE 7) | !(IE 8)  ]><!--><html
+class="no-js" lang="en-US" prefix="og: http://ogp.me/ns#">
+<!--<![endif]--><head><link
+rel="stylesheet" type="text/css" href="http://www.sqlrelease.com/wp-content/cache/minify/443ae.css?x43477" media="all" /><meta
+charset="UTF-8" /><meta
+http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" /><meta
+name="viewport" content="width=device-width, initial-scale=1.0" /><link
+rel="profile" href="http://gmpg.org/xfn/11" /><link
+rel="pingback" href="http://www.sqlrelease.com/xmlrpc.php" />
+<!--[if lt IE 9]> <script src="http://www.sqlrelease.com/wp-content/themes/customizr/inc/assets/js/html5.js?x43477"></script> <![endif]--> <script>(function(html){html.className=html.className.replace(/\bno-js\b/,'js')})(document.documentElement);</script> <title>Query Execution Flow Architecture (SQL Server) - SQLRelease</title><meta
+name="description" content="Understanding query execution flow in sql server with the role of relation engine, parser, alzebrizer, query optimizer and storage engine."/><link
+rel="canonical" href="http://www.sqlrelease.com/query-execution-flow-architecture-sql-server" /><meta
+property="og:locale" content="en_US" /><meta
+property="og:type" content="article" /><meta
+property="og:title" content="Query Execution Flow Architecture (SQL Server) - SQLRelease" /><meta
+property="og:description" content="Understanding query execution flow in sql server with the role of relation engine, parser, alzebrizer, query optimizer and storage engine." /><meta
+property="og:url" content="http://www.sqlrelease.com/query-execution-flow-architecture-sql-server" /><meta
+property="og:site_name" content="SQLRelease" /><meta
+property="article:publisher" content="http://www.facebook.com/sqlrelease" /><meta
+property="article:author" content="https://www.facebook.com/sqlrelease" /><meta
+property="article:tag" content="query execution" /><meta
+property="article:tag" content="query plan" /><meta
+property="article:tag" content="sql architecture" /><meta
+property="article:section" content="Performance Tuning" /><meta
+property="article:published_time" content="2014-09-19T20:18:45+05:30" /><meta
+property="article:modified_time" content="2016-04-30T02:33:50+05:30" /><meta
+property="og:updated_time" content="2016-04-30T02:33:50+05:30" /><meta
+property="og:image" content="http://www.sqlrelease.com/wp-content/uploads/2015/04/Query-Execution-Flow.png" /><meta
+property="og:image:width" content="1034" /><meta
+property="og:image:height" content="625" /><meta
+property="og:image:alt" content="Query Execution Flow" /><meta
+property="og:image" content="http://www.sqlrelease.com/wp-content/uploads/2015/04/Query-Execution-Flow-Flow-Chart.png" /><meta
+property="og:image:width" content="605" /><meta
+property="og:image:height" content="404" /><meta
+property="og:image:alt" content="Query Execution Flow - Flow Chart" /> <script type='application/ld+json'>{"@context":"https:\/\/schema.org","@type":"Person","url":"http:\/\/www.sqlrelease.com\/","sameAs":["http:\/\/www.facebook.com\/sqlrelease","https:\/\/twitter.com\/ergkranjan"],"@id":"#person","name":"Gopal Krishna Ranjan"}</script> <link
+rel="amphtml" href="http://www.sqlrelease.com/query-execution-flow-architecture-sql-server/amp" /><link
+rel='dns-prefetch' href='//fonts.googleapis.com' /><link
+rel='dns-prefetch' href='//s.w.org' /><link
+rel="alternate" type="application/rss+xml" title="SQLRelease &raquo; Feed" href="http://www.sqlrelease.com/feed" /><link
+rel="alternate" type="application/rss+xml" title="SQLRelease &raquo; Comments Feed" href="http://www.sqlrelease.com/comments/feed" /><link
+rel="alternate" type="application/rss+xml" title="SQLRelease &raquo; Query Execution Flow Architecture (SQL Server) Comments Feed" href="http://www.sqlrelease.com/query-execution-flow-architecture-sql-server/feed" /> <script type="text/javascript">/*<![CDATA[*/window._wpemojiSettings={"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.4\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.4\/svg\/","svgExt":".svg","source":{"concatemoji":"http:\/\/www.sqlrelease.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=eacceeb95998ac8e048414433a5e42fe"}};!function(a,b,c){function d(a,b){var c=String.fromCharCode;l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,a),0,0);var d=k.toDataURL();l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,b),0,0);var e=k.toDataURL();return d===e}function e(a){var b;if(!l||!l.fillText)return!1;switch(l.textBaseline="top",l.font="600 32px Arial",a){case"flag":return!(b=d([55356,56826,55356,56819],[55356,56826,8203,55356,56819]))&&(b=d([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]),!b);case"emoji":return b=d([55357,56692,8205,9792,65039],[55357,56692,8203,9792,65039]),!b}return!1}function f(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var g,h,i,j,k=b.createElement("canvas"),l=k.getContext&&k.getContext("2d");for(j=Array("flag","emoji"),c.supports={everything:!0,everythingExceptFlag:!0},i=0;i<j.length;i++)c.supports[j[i]]=e(j[i]),c.supports.everything=c.supports.everything&&c.supports[j[i]],"flag"!==j[i]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[j[i]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(h=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",h,!1),a.addEventListener("load",h,!1)):(a.attachEvent("onload",h),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),g=c.source||{},g.concatemoji?f(g.concatemoji):g.wpemoji&&g.twemoji&&(f(g.twemoji),f(g.wpemoji)))}(window,document,window._wpemojiSettings);/*]]>*/</script> <style type="text/css">img.wp-smiley,img.emoji{display:inline !important;border:none !important;box-shadow:none !important;height:1em !important;width:1em !important;margin:0 .07em !important;vertical-align:-0.1em !important;background:none !important;padding:0 !important}</style><link
+rel='stylesheet' id='tc-gfonts-css'  href='//fonts.googleapis.com/css?family=Roboto%7CRoboto' type='text/css' media='all' /><link
+rel='stylesheet' id='sharify-css'  href='http://www.sqlrelease.com/wp-content/plugins/sharify/sharify-style.php' type='text/css' media='all' /><link
+rel='stylesheet' id='sharify-font-css'  href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400' type='text/css' media='all' /><style id='yasrcss-inline-css' type='text/css'>.rateit .rateit-range{background:url(http://www.sqlrelease.com/wp-content/plugins/yet-another-stars-rating/img/star.png) left 0px !important}.rateit .rateit-hover{background:url(http://www.sqlrelease.com/wp-content/plugins/yet-another-stars-rating/img/star.png) left -21px !important}.rateit .rateit-selected{background:url(http://www.sqlrelease.com/wp-content/plugins/yet-another-stars-rating/img/star.png) left -42px !important}div.medium .rateit-range{background:url(http://www.sqlrelease.com/wp-content/plugins/yet-another-stars-rating/img/stars24.png) left 0px !important}div.medium .rateit-hover{background:url(http://www.sqlrelease.com/wp-content/plugins/yet-another-stars-rating/img/stars24.png) left -29px !important}div.medium .rateit-selected{background:url(http://www.sqlrelease.com/wp-content/plugins/yet-another-stars-rating/img/stars24.png) left -58px !important}div.bigstars .rateit-range{background:url(http://www.sqlrelease.com/wp-content/plugins/yet-another-stars-rating/img/stars32.png) left 0px !important}div.bigstars .rateit-hover{background:url(http://www.sqlrelease.com/wp-content/plugins/yet-another-stars-rating/img/stars32.png) left -37px !important}div.bigstars .rateit-selected{background:url(http://www.sqlrelease.com/wp-content/plugins/yet-another-stars-rating/img/stars32.png) left -74px !important}</style><style id='customizr-skin-inline-css' type='text/css'>.site-title,.site-description,h1,h2,h3,.tc-dropcap{font-family:'Roboto';font-weight:inherit}body,.navbar .nav>li>a{font-family:'Roboto';font-weight:inherit}table{border-collapse:separate}body table{border-collapse:collapse}.social-links .social-icon:before{content:none}</style><link
+rel='stylesheet' id='customizr-style-css'  href='http://www.sqlrelease.com/wp-content/themes/customizr-extended/style.css?x43477' type='text/css' media='all' /> <script type="text/javascript" src="http://www.sqlrelease.com/wp-content/cache/minify/7d81d.js?x43477"></script> <script type='text/javascript'>var TCParams={"_disabled":[],"FancyBoxState":"1","FancyBoxAutoscale":"1","SliderName":"","SliderDelay":"","SliderHover":"1","centerSliderImg":"1","SmoothScroll":{"Enabled":true,"Options":{"touchpadSupport":false}},"anchorSmoothScroll":"linear","anchorSmoothScrollExclude":{"simple":["[class*=edd]",".tc-carousel-control",".carousel-control","[data-toggle=\"modal\"]","[data-toggle=\"dropdown\"]","[data-toggle=\"tooltip\"]","[data-toggle=\"popover\"]","[data-toggle=\"collapse\"]","[data-toggle=\"tab\"]","[data-toggle=\"pill\"]","[class*=upme]","[class*=um-]"],"deep":{"classes":[],"ids":[]}},"ReorderBlocks":"","centerAllImg":"1","HasComments":"","LeftSidebarClass":".span3.left.tc-sidebar","RightSidebarClass":".span3.right.tc-sidebar","LoadModernizr":"1","stickyCustomOffset":{"_initial":0,"_scrolling":0,"options":{"_static":true,"_element":""}},"stickyHeader":"","dropdowntoViewport":"","timerOnScrollAllBrowsers":"1","extLinksStyle":"1","extLinksTargetExt":"1","extLinksSkipSelectors":{"classes":["btn","button"],"ids":[]},"dropcapEnabled":"","dropcapWhere":{"post":"","page":""},"dropcapMinWords":"50","dropcapSkipSelectors":{"tags":["IMG","IFRAME","H1","H2","H3","H4","H5","H6","BLOCKQUOTE","UL","OL"],"classes":["btn","tc-placeholder-wrap"],"id":[]},"imgSmartLoadEnabled":"","imgSmartLoadOpts":{"parentSelectors":[".article-container",".__before_main_wrapper",".widget-front"],"opts":{"excludeImg":[".tc-holder-img"]}},"imgSmartLoadsForSliders":"","goldenRatio":"1.618","gridGoldenRatioLimit":"350","isSecondMenuEnabled":"","secondMenuRespSet":"in-sn-before","isParallaxOn":"1","parallaxRatio":"0.55","pluginCompats":[],"adminAjaxUrl":"http:\/\/www.sqlrelease.com\/wp-admin\/admin-ajax.php","ajaxUrl":"http:\/\/www.sqlrelease.com\/?czrajax=1","frontNonce":{"id":"CZRFrontNonce","handle":"d4ed0e4aa0"},"isDevMode":"","isModernStyle":"","i18n":{"Permanently dismiss":"Permanently dismiss"},"frontNotifications":{"styleSwitcher":{"enabled":false,"content":"","dismissAction":"dismiss_style_switcher_note_front","ajaxUrl":"http:\/\/www.sqlrelease.com\/wp-admin\/admin-ajax.php"}}};</script> <script type="text/javascript" src="http://www.sqlrelease.com/wp-content/cache/minify/3235d.js?x43477"></script> <link
+rel='https://api.w.org/' href='http://www.sqlrelease.com/wp-json/' /><link
+rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.sqlrelease.com/xmlrpc.php?rsd" /><link
+rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.sqlrelease.com/wp-includes/wlwmanifest.xml" /><link
+rel='shortlink' href='http://www.sqlrelease.com/?p=97' /><link
+rel="alternate" type="application/json+oembed" href="http://www.sqlrelease.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.sqlrelease.com%2Fquery-execution-flow-architecture-sql-server" /><link
+rel="alternate" type="text/xml+oembed" href="http://www.sqlrelease.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.sqlrelease.com%2Fquery-execution-flow-architecture-sql-server&#038;format=xml" /><meta
+name="google-site-verification" content="5p-tjYQYDLhU__uvntL0ewr8R6zdGjkopyQj3AiAWlU" /><script type="text/javascript">/*<![CDATA[*/(function(url){if(/(?:Chrome\/26\.0\.1410\.63 Safari\/537\.31|WordfenceTestMonBot)/.test(navigator.userAgent)){return;}
+var addEvent=function(evt,handler){if(window.addEventListener){document.addEventListener(evt,handler,false);}else if(window.attachEvent){document.attachEvent('on'+evt,handler);}};var removeEvent=function(evt,handler){if(window.removeEventListener){document.removeEventListener(evt,handler,false);}else if(window.detachEvent){document.detachEvent('on'+evt,handler);}};var evts='contextmenu dblclick drag dragend dragenter dragleave dragover dragstart drop keydown keypress keyup mousedown mousemove mouseout mouseover mouseup mousewheel scroll'.split(' ');var logHuman=function(){if(window.wfLogHumanRan){return;}
+window.wfLogHumanRan=true;var wfscr=document.createElement('script');wfscr.type='text/javascript';wfscr.async=true;wfscr.src=url+'&r='+Math.random();(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(wfscr);for(var i=0;i<evts.length;i++){removeEvent(evts[i],logHuman);}};for(var i=0;i<evts.length;i++){addEvent(evts[i],logHuman);}})('//www.sqlrelease.com/?wordfence_lh=1&hid=287BADDD865EF54E875887E325146B5A');/*]]>*/</script><script type="text/javascript">window._wp_rp_static_base_url='https://wprp.zemanta.com/static/';window._wp_rp_wp_ajax_url="http://www.sqlrelease.com/wp-admin/admin-ajax.php";window._wp_rp_plugin_version='3.6.4';window._wp_rp_post_id='97';window._wp_rp_num_rel_posts='5';window._wp_rp_thumbnails=false;window._wp_rp_post_title='Query+Execution+Flow+Architecture+%28SQL+Server%29';window._wp_rp_post_tags=['query+execution','sql+architecture','query+plan','sql+server','performance+tuning','code','sql','flow','submiss','architectur','execut','engin','a','class','queri','server','imag','optim','storag','articl'];window._wp_rp_promoted_content=true;</script> <script type="text/javascript">/*<![CDATA[*/if(!window["WPAC"])var WPAC={};WPAC._Options={debug:false,selectorCommentForm:"#commentform",selectorCommentsContainer:"#comments",selectorCommentPagingLinks:"#comments [class^='nav-'] a",selectorCommentLinks:"#comments a[href*=\"/comment-page-\"]",selectorRespondContainer:"#respond",selectorErrorContainer:"p:parent",popupCornerRadius:5,popupMarginTop:10,popupWidth:30,popupPadding:5,popupFadeIn:400,popupFadeOut:400,popupTimeout:3000,popupBackgroundColorLoading:"#000",popupTextColorLoading:"#fff",popupBackgroundColorSuccess:"#008000",popupTextColorSuccess:"#fff",popupBackgroundColorError:"#f00",popupTextColorError:"#fff",popupOpacity:70,popupTextAlign:"center",popupTextFontSize:"Default font size",popupZindex:50000,scrollSpeed:500,autoUpdateIdleTime:0,textPosted:"Your comment has been posted. Thank you!",textPostedUnapproved:"Your comment has been posted and is awaiting moderation. Thank you!",textReloadPage:"Reloading page. Please wait&hellip;",textPostComment:"Posting your comment. Please wait&hellip;",textRefreshComments:"Loading comments. Please wait&hellip;",textUnknownError:"Something went wrong, your comment has not been posted.",selectorPostContainer:"",commentPagesUrlRegex:"",asyncLoadTrigger:"DomReady",disableUrlUpdate:false,disableScrollToAnchor:false,disableCache:false,enableByQuery:false,commentsEnabled:true,version:"1.5.1"};WPAC._Callbacks={"beforeSelectElements":function(dom){},"beforeUpdateComments":function(newDom,commentUrl){},"afterUpdateComments":function(newDom,commentUrl){},"beforeSubmitComment":function(){},"afterPostComment":function(commentUrl,unapproved){}};/*]]>*/</script><link
+id="czr-favicon" rel="shortcut icon" href="http://www.sqlrelease.com/wp-content/uploads/2015/04/favicon1.ico?x43477" type="image/x-icon"><style type="text/css" id="syntaxhighlighteranchor"></style></head><body
+class="post-template-default single single-post postid-97 single-format-standard dwpb-push-page tc-fade-hover-links tc-r-sidebar tc-center-images skin-blue tc-no-sticky-header sticky-disabled tc-regular-menu" ><div
+id="tc-page-wrap" class="">
+<header
+class="tc-header clearfix row-fluid tc-tagline-on tc-title-logo-on  tc-shrink-off tc-menu-on logo-left tc-second-menu-in-sn-before-when-mobile" role="banner"><div
+class="brand span3 pull-left">
+<a
+class="site-logo" href="http://www.sqlrelease.com/" title="SQLRelease | SQL Server, Python, Big Data, BI, DWH, Machine Learning, and Data Science"><img
+src="http://www.sqlrelease.com/wp-content/uploads/2015/04/logo1.png?x43477" alt="Back Home" width="214" height="82" style="max-width:250px;max-height:100px" data-no-retina class=" attachment-381"/></a></div><div
+class="container outside"><h2 class="site-description">SQL Server, Python, Big Data, BI, DWH, Machine Learning, and Data Science</h2></div><div
+class="navbar-wrapper clearfix span9 tc-submenu-fade tc-submenu-move tc-open-on-hover pull-menu-left"><div
+class="navbar resp"><div
+class="navbar-inner" role="navigation"><div
+class="row-fluid"><div
+class="social-block span5"><div
+class="social-links"><a
+rel="nofollow" class="social-icon icon-feed"  title="Subscribe to my rss feed" aria-label="Subscribe to my rss feed" href="http://www.sqlrelease.com/feed/rss"  target="_blank" ><i
+class="fas fa-rss"></i></a><a
+rel="nofollow" class="social-icon icon-twitter"  title="Follow me on Twitter" aria-label="Follow me on Twitter" href="https://twitter.com/ergkranjan"  target="_blank" ><i
+class="fab fa-twitter"></i></a><a
+rel="nofollow" class="social-icon icon-facebook"  title="Follow me on Facebook" aria-label="Follow me on Facebook" href="https://www.facebook.com/sqlrelease"  target="_blank" ><i
+class="fab fa-facebook"></i></a><a
+rel="nofollow" class="social-icon icon-google"  title="Follow me on Google+" aria-label="Follow me on Google+" href="https://plus.google.com/+Sqlreleasepage"  target="_blank" ><i
+class="fab fa-google"></i></a><a
+rel="nofollow" class="social-icon icon-youtube"  title="Follow me on Youtube" aria-label="Follow me on Youtube" href="https://www.youtube.com/channel/UCF4IvmVUzd7to5L87nn9fhw"  target="_blank" ><i
+class="fab fa-youtube"></i></a><a
+rel="nofollow" class="social-icon icon-linkedin"  title="Follow me on LinkedIn" aria-label="Follow me on LinkedIn" href="http://in.linkedin.com/in/ergkranjan"  target="_blank" ><i
+class="fab fa-linkedin"></i></a></div></div><h2 class="span7 inside site-description">SQL Server, Python, Big Data, BI, DWH, Machine Learning, and Data Science</h2><div
+class="nav-collapse collapse tc-hover-menu-wrapper"><div
+class="menu-main-menu-container"><ul
+id="menu-main-menu-2" class="nav tc-hover-menu"><li
+class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-843"><a
+href="http://www.sqlrelease.com">Home</a></li><li
+class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children dropdown menu-item-849"><a
+href="#">Categories <strong
+class="caret"></strong></a><ul
+class="dropdown-menu"><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-850"><a
+href="http://www.sqlrelease.com/category/sql-server">SQL Server</a></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1280"><a
+href="http://www.sqlrelease.com/category/big-data/python">Python</a></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-851"><a
+href="http://www.sqlrelease.com/category/sql-server/performance-tuning">Performance Tuning</a></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-852"><a
+href="http://www.sqlrelease.com/category/sql-server-tutorial-for-beginners">SQL Server Tutorial For Beginners</a></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-853"><a
+href="http://www.sqlrelease.com/category/data-warehouse">Data Warehouse</a></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-854"><a
+href="http://www.sqlrelease.com/category/msbi">MSBI</a></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-855"><a
+href="http://www.sqlrelease.com/category/msbi/ssrs">SSRS</a></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1188"><a
+href="http://www.sqlrelease.com/category/msbi/ssis">SSIS</a></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-856"><a
+href="http://www.sqlrelease.com/category/msbi/ssas">SSAS</a></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-857"><a
+href="http://www.sqlrelease.com/category/net">.NET</a></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-858"><a
+href="http://www.sqlrelease.com/category/net/asp-net">ASP.NET</a></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-859"><a
+href="http://www.sqlrelease.com/category/net/c">C#</a></li></ul></li><li
+class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children dropdown menu-item-848"><a
+href="#">Tutorials <strong
+class="caret"></strong></a><ul
+class="dropdown-menu"><li
+class="menu-item menu-item-type-custom menu-item-object-custom menu-item-844"><a
+href="http://www.sqlrelease.com/sql-server-tutorial/sql-server-tutorial-about">SQL Server Tutorial</a></li></ul></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children dropdown menu-item-1047"><a
+href="http://www.sqlrelease.com/category/video-learning">Videos <strong
+class="caret"></strong></a><ul
+class="dropdown-menu"><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1048"><a
+href="http://www.sqlrelease.com/category/video-learning/unfolding-set-based-approach">Unfolding | Set Based Approach</a></li></ul></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children dropdown menu-item-1355"><a
+href="http://www.sqlrelease.com/category/big-data">Big Data <strong
+class="caret"></strong></a><ul
+class="dropdown-menu"><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1356"><a
+href="http://www.sqlrelease.com/category/big-data/azure">Azure</a></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1357"><a
+href="http://www.sqlrelease.com/category/big-data/hive">Hive</a></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1358"><a
+href="http://www.sqlrelease.com/category/big-data/python">Python</a></li></ul></li><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children dropdown menu-item-1314"><a
+href="http://www.sqlrelease.com/category/tools">Tools <strong
+class="caret"></strong></a><ul
+class="dropdown-menu"><li
+class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1315"><a
+href="http://www.sqlrelease.com/category/tools/free-tools">Free Tools</a></li></ul></li><li
+class="menu-item menu-item-type-post_type menu-item-object-page menu-item-841"><a
+href="http://www.sqlrelease.com/contact">Contact</a></li><li
+class="menu-item menu-item-type-post_type menu-item-object-page menu-item-842"><a
+href="http://www.sqlrelease.com/about">About</a></li></ul></div></div><div
+class="btn-toggle-nav pull-right"><button
+type="button" class="btn menu-btn" data-toggle="collapse" data-target=".nav-collapse" title="Open the menu" aria-label="Open the menu"><span
+class="icon-bar"></span><span
+class="icon-bar"></span><span
+class="icon-bar"></span> </button></div></div></div></div></div>
+</header><div
+id="main-wrapper" class="container"><div
+class="tc-hot-crumble container" role="navigation"><div
+class="row"><div
+class="span12"><div
+class="breadcrumb-trail breadcrumbs" itemprop="breadcrumb"><span
+class="trail-begin"><a
+href="http://www.sqlrelease.com" title="SQLRelease" rel="home" class="trail-begin">Home</a></span> <span
+class="sep">&raquo;</span> <a
+href="http://www.sqlrelease.com/category/sql-server" title="SQL Server">SQL Server</a> <span
+class="sep">&raquo;</span> <a
+href="http://www.sqlrelease.com/category/sql-server/performance-tuning" title="Performance Tuning">Performance Tuning</a> <span
+class="sep">&raquo;</span> <span
+class="trail-end">Query Execution Flow Architecture (SQL Server)</span></div></div></div></div><div
+class="container" role="main"><div
+class="row column-content-wrapper"><div
+id="content" class="span9 article-container tc-gallery-style"><div
+class='code-block code-block-1' style='margin: 8px 0; clear: both;'> <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+<ins
+class="adsbygoogle"
+style="display:block"
+data-ad-client="ca-pub-7435349961140815"
+data-ad-slot="3961991700"
+data-ad-format="auto"></ins> <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div><article
+id="post-97" class="row-fluid post-97 post type-post status-publish format-standard hentry category-performance-tuning category-sql-server tag-query-execution tag-query-plan tag-sql-architecture">
+<header
+class="entry-header"><h1 class="entry-title ">Query Execution Flow Architecture (SQL Server)</h1><div
+class="entry-meta"><a
+href="http://www.sqlrelease.com/2014/09/19" title="8:18 pm" rel="bookmark"><time
+class="entry-date updated" datetime="2014-09-19T20:18:45+00:00">19 Sep, 2014</time></a> &nbsp;in <a
+class="" href="http://www.sqlrelease.com/category/sql-server/performance-tuning" title="View all posts in Performance Tuning"> Performance Tuning </a> / <a
+class="" href="http://www.sqlrelease.com/category/sql-server" title="View all posts in SQL Server"> SQL Server </a>&nbsp;tagged <a
+class="" href="http://www.sqlrelease.com/tag/query-execution" title="View all posts in query execution"> query execution </a> / <a
+class="" href="http://www.sqlrelease.com/tag/query-plan" title="View all posts in query plan"> query plan </a> / <a
+class="" href="http://www.sqlrelease.com/tag/sql-architecture" title="View all posts in sql architecture"> sql architecture </a> <span
+class="by-author"> by <span
+class="author vcard author_name"><a
+class="url fn n" href="http://www.sqlrelease.com/author/gopal-krishna-ranjan" title="View all posts by Gopal Krishna Ranjan" rel="author">Gopal Krishna Ranjan</a></span></span></div><hr
+class="featurette-divider __before_content">        </header>
+<section
+class="entry-content "><p>In this article, we are going to discuss the SQL Server&#8217;s query execution flow architecture. When a query gets submitted to SQL Server, it goes through multiple steps before final output. We will discuss all these steps of &#8220;Query Execution Flow&#8221; starting from query submission to getting output.</p><p>As we all know that SQL Server has various components to perform various tasks on the given query. Each component performs some operation and pushes its output to the next component in the pipeline.</p><p>Lets understand the query execution flow architecture of DML statements. DDL and DCL statements do not follow optimization steps and gets submitted to storage engine directly after parsing step.</p><h3>SQL Server Engine Architecture:</h3><p>Below are the major components of SQL Server;</p><ol><li>Relation Engine<ol><li>Parser</li><li>Alzebrizer</li><li>Query Optimizer</li></ol></li><li>Storage Engine</li></ol><p>Just have a look on the below image and then read the below details carefully;</p><div
+id="attachment_98" style="width: 905px" class="wp-caption alignnone"><a
+href="http://www.sqlrelease.com/wp-content/uploads/2015/04/Query-Execution-Flow.png?x43477"class="grouped_elements" rel="tc-fancybox-group97"><img
+class=" wp-image-98" src="http://www.sqlrelease.com/wp-content/uploads/2015/04/Query-Execution-Flow.png?x43477" alt="Query Execution Flow" width="895" height="541" srcset="http://www.sqlrelease.com/wp-content/uploads/2015/04/Query-Execution-Flow.png 1034w, http://www.sqlrelease.com/wp-content/uploads/2015/04/Query-Execution-Flow-300x181.png 300w, http://www.sqlrelease.com/wp-content/uploads/2015/04/Query-Execution-Flow-1024x619.png 1024w" sizes="(max-width: 895px) 100vw, 895px" /></a><p
+class="wp-caption-text">Query Execution Flow</p></div><p>As we can see in above image, Relation engine has parser, alzebrizer, and query optimizer as its component. Each component has its own role and responsibility. Below are the details:</p><h3><strong>Relation Engine</strong></h3><p>It is a combination of parser, alzebrizer and query optimizer.</p><h3><strong>Parser</strong></h3><p>It parses the submitted t-sql code and checks for the syntax. If submitted t-sql is correct, it generates the parse tree and submit its to alzebrizer if given t-sql is a DML statement. In case of DDL and DCL, it directly sends to storage engine.</p><h3>Alzebrizer</h3><p>Input for alzebrizer is a <strong>parse tree</strong>, generated from parser and it also responsible for binding. It resolves all the names and determines aggregates. It generates <strong>alzebrized tree or binary tree</strong> and submits it to query optimizer.</p><h3>Query Optimizer</h3><p>Query optimizer is responsible for creating a &#8220;<strong>Good enough plan</strong>&#8221; instead of &#8220;maximum performance plan&#8221; to execute the given t-sql code. SQL Server optimizer is a &#8220;<strong>cost based optimizer</strong>&#8220;. It generates multiple plan (if no plan is found in cache) for the given t-sql and choose the lowest cost plan from the generated plans. There are some thresholds to recognize the limits of number of plans generated and type of plans like with single processor or using parallelism(multiple processors).</p><p>It uses the query processor tree and statistics it has about the data, and applying the model, it works out what it thinks will be the optimal way to execute the query.</p><p>It decided indexes to be used, types of joins to be performed and much more. It decides the plan based on the cost and the cost can be defined as a combination of <strong>CPU processing time and I/O cost</strong>.</p><p>If your query is very simple, it will generate a trivial plan eg a single table with no index. In such type of cases instead of spending time to generate an optimal plan, it simply generates a trivial plan. But if the query is non-trivial, optimizer performs cost-based calculation to select a plan.</p><p>And once the optimizer arrives at an execution plan, this plan is stored in memory known as <strong>plan cache</strong>. So that when next time the same t-sql batch will execute, this plan can be reused.</p><p>Once the plan execution plan is selected, query optimizer transfers the control to &#8220;Storage Engine&#8221;.</p><p>Here we get the &#8220;<strong>estimated execution plan</strong>&#8220;.</p><p>Up to this component all are sub components of <strong>relation engine</strong>.</p><h3>Storage Engine</h3><p>Storage engine is responsible for actual execution of the query. During actual execution in certain cases the execution plan can be changed slightly. eg. in case of deferred plans (DML + DDL). Here we get &#8220;<strong>actual execution plan</strong>&#8220;. In case the plan is being changed during actual execution, we can get some slight differences in actual and estimated plans. The output of the executed query is returned to the caller.</p><p>The same can be displayed as a flow chart as below;</p><div
+id="attachment_99" style="width: 615px" class="wp-caption alignnone"><a
+href="http://www.sqlrelease.com/wp-content/uploads/2015/04/Query-Execution-Flow-Flow-Chart.png?x43477"class="grouped_elements" rel="tc-fancybox-group97"><img
+class="size-full wp-image-99" src="http://www.sqlrelease.com/wp-content/uploads/2015/04/Query-Execution-Flow-Flow-Chart.png?x43477" alt="Query Execution Flow - Flow Chart" width="605" height="404" srcset="http://www.sqlrelease.com/wp-content/uploads/2015/04/Query-Execution-Flow-Flow-Chart.png 605w, http://www.sqlrelease.com/wp-content/uploads/2015/04/Query-Execution-Flow-Flow-Chart-300x200.png 300w" sizes="(max-width: 605px) 100vw, 605px" /></a><p
+class="wp-caption-text">Query Execution Flow &#8211; Flow Chart</p></div><h2>Conclusion</h2><p>In this article, i have tried to cover the different components and their responsibilities during tsql query execution and also attached images to make it easy to understand for you.</p><p>Hope you have enjoyed this article. If you like this article, please share your comments here and also share this article on your social media channels.</p><div
+class='code-block code-block-2' style='margin: 8px 0; clear: both;'> <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+<ins
+class="adsbygoogle"
+style="display:block"
+data-ad-client="ca-pub-7435349961140815"
+data-ad-slot="7594114954"
+data-ad-format="auto"></ins> <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div><div
+class="sharify-container"><ul><li
+class="sharify-btn-twitter">
+<a
+title="Tweet on Twitter" href="https://twitter.com/intent/tweet?text=Query+Execution+Flow+Architecture+%28SQL+Server%29: http://www.sqlrelease.com/query-execution-flow-architecture-sql-server" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;">
+<span
+class="sharify-icon"><i
+class="sharify sharify-twitter"></i></span>
+<span
+class="sharify-title">Tweet</span>
+</a></li><li
+class="sharify-btn-facebook">
+<a
+title="Share on Facebook" href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fwww.sqlrelease.com%2Fquery-execution-flow-architecture-sql-server" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;">
+<span
+class="sharify-icon"><i
+class="sharify sharify-facebook"></i></span>
+<span
+class="sharify-title">Share</span>
+<span
+class="sharify-count">0</span>
+</a></li><li
+class="sharify-btn-reddit">
+<a
+title="Submit to Reddit" href="http://reddit.com/submit?url=http://www.sqlrelease.com/query-execution-flow-architecture-sql-server" onclick="window.open(this.href, 'mywin','left=50,top=50,width=950,height=450,toolbar=0'); return false;">
+<span
+class="sharify-icon"><i
+class="sharify sharify-reddit"></i></span>
+<span
+class="sharify-title">Reddit</span>
+</a></li><li
+class="sharify-btn-gplus">
+<a
+title="Share on Google+" href="http://plus.google.com/share?url=http://www.sqlrelease.com/query-execution-flow-architecture-sql-server" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;">
+<span
+class="sharify-icon"><i
+class="sharify sharify-gplus"></i></span>
+<span
+class="sharify-title">+1</span>
+</a></li><li
+class="sharify-btn-pocket">
+<a
+title="Save to read later on Pocket" href="https://getpocket.com/save?url=http%3A%2F%2Fwww.sqlrelease.com%2Fquery-execution-flow-architecture-sql-server" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;">
+<span
+class="sharify-icon"><i
+class="sharify sharify-pocket"></i></span>
+<span
+class="sharify-title">Pocket</span>
+</a></li><li
+class="sharify-btn-pinterest">
+<a
+title="Share on Pinterest" href="http://pinterest.com/pin/create/button/?url=http://www.sqlrelease.com/query-execution-flow-architecture-sql-server&media=http://www.sqlrelease.com/wp-content/uploads/2015/04/Query-Execution-Flow.png&description=Query"class="grouped_elements" rel="tc-fancybox-group97" Execution Flow Architecture (SQL Server) - http://www.sqlrelease.com/query-execution-flow-architecture-sql-server" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;">
+<span
+class="sharify-icon"><i
+class="sharify sharify-pinterest"></i></span>
+<span
+class="sharify-title">Pinterest</span>
+<span
+class="sharify-count">0</span>
+</a></li><li
+class="sharify-btn-linkedin">
+<a
+title="Share on Linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=http://www.sqlrelease.com/query-execution-flow-architecture-sql-server&title=Query Execution Flow Architecture (SQL Server)" onclick="if(!document.getElementById('td_social_networks_buttons')){window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;}" >
+<span
+class="sharify-icon"><i
+class="sharify sharify-linkedin"></i></span>
+<span
+class="sharify-title">LinkedIn</span>
+<span
+class="sharify-count">0</span>
+</a></li><li
+class="sharify-btn-email">
+<a
+title="Share via mail" href="mailto:?subject=Query Execution Flow Architecture (SQL Server)&body= - http://www.sqlrelease.com/query-execution-flow-architecture-sql-server">
+<span
+class="sharify-icon"><i
+class="sharify sharify-mail"></i></span>
+<span
+class="sharify-title">Email</span>
+</a></li></ul></div><div
+class="wp_rp_wrap  wp_rp_vertical_m" id="wp_rp_first"><div
+class="wp_rp_content"><h3 class="related_post_title">Related Posts</h3><ul
+class="related_post wp_rp"><li
+data-position="0" data-poid="in-83" data-post-type="none" ><a
+href="http://www.sqlrelease.com/nested-loop-merge-and-hash-joins-in-sql-server" class="wp_rp_title">Nested Loop, Merge and Hash Joins in SQL Server</a></li><li
+data-position="1" data-poid="in-144" data-post-type="none" ><a
+href="http://www.sqlrelease.com/index-join-in-sql-server" class="wp_rp_title">Index Join in sql server</a></li><li
+data-position="2" data-poid="in-173" data-post-type="none" ><a
+href="http://www.sqlrelease.com/indexed-views-in-sql-server" class="wp_rp_title">Indexed Views in SQL Server</a></li><li
+data-position="3" data-poid="in-887" data-post-type="none" ><a
+href="http://www.sqlrelease.com/query-performance-tuning-general-guidelines" class="wp_rp_title">Query Performance Tuning &#8211; General Guidelines</a></li><li
+data-position="4" data-poid="in-1051" data-post-type="none" ><a
+href="http://www.sqlrelease.com/unfolding-set-based-approach-sql-server-query-execution-architecture-episode-3" class="wp_rp_title">Unfolding | Set Based Approach | SQL Server Query execution architecture – Episode 3</a></li></ul></div></div><div
+id="yasr_visitor_votes_97" class="yasr-visitor-votes"><div
+class="yasr-container-custom-text-and-visitor-rating">
+<span
+id="yasr-custom-text-before-visitor-rating">Rate This</span></div><div
+class="rateit medium yasr_visitor_votes_stars_div" id="yasr_rateit_visitor_votes_97" data-postid="97" data-rateit-starwidth="24" data-rateit-starheight="24" data-rateit-value="4.5" data-rateit-step="1" data-rateit-resetable="false" data-rateit-readonly="false"></div><span
+class="dashicons dashicons-chart-bar yasr-dashicons-visitor-stats " id="yasr-total-average-dashicon-97" title="yasr-stats-dashicon"></span><span
+class="yasr-total-average-container" id="yasr-total-average-text_97">
+[Total: 2 &nbsp; &nbsp;Average: 4.5/5]
+</span></div>
+ <script type="application/ld+json">{"@context":"http:\/\/schema.org\/","@type":"Product","name":"Query Execution Flow Architecture (SQL Server)","aggregateRating":{"@type":"AggregateRating","ratingValue":"4.5","ratingCount":"2"}}</script><div
+class='code-block code-block-3' style='margin: 8px 0; clear: both;'> <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+<ins
+class="adsbygoogle"
+style="display:block"
+data-ad-client="ca-pub-7435349961140815"
+data-ad-slot="7413973945"
+data-ad-format="auto"></ins> <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>
+</section>
+<footer
+class="entry-meta"><hr
+class="featurette-divider"><div
+class="author-info-wrapper"><div
+class="author-info"><div
+class="row-fluid"><div
+class="comment-avatar author-avatar span2"><img
+src="http://www.sqlrelease.com/wp-content/uploads/2015/03/MyPic-150x150.jpg?x43477" width="100" height="100" alt="Gopal Krishna Ranjan" class="avatar avatar-100 wp-user-avatar wp-user-avatar-100 alignnone photo" /></div><div
+class="author-description span10"><h3>About Gopal Krishna Ranjan</h3><p>Gopal has 8 years of industry experience in Software development. He has a head down experience in Data Science, Database, Data Warehouse, Big Data and cloud technologies and has implemented end to end solutions.
+He has extensively worked on SQL Server, Python, Hadoop, Hive, Spark, Azure, Machine Learning, and MSBI (SSAS, SSIS, and SSRS). He also has good experience in windows and web application development using ASP.Net and C#.</p><div
+class="author-link"><a
+href="http://www.sqlrelease.com/author/gopal-krishna-ranjan" rel="author">View all posts by Gopal Krishna Ranjan <span
+class="meta-nav">&rarr;</span></a></div></div></div></div></div></footer>                                    </article><div
+id="comments" class="comments-area" ><div
+id="respond" class="comment-respond"><h3 id="reply-title" class="comment-reply-title">Leave a comment <small><a
+rel="nofollow" id="cancel-comment-reply-link" href="/query-execution-flow-architecture-sql-server#respond" style="display:none;">Cancel reply</a></small></h3><form
+action="http://www.sqlrelease.com/wp-comments-post.php" method="post" id="commentform" class="comment-form"><p
+class="comment-notes"><span
+id="email-notes">Your email address will not be published.</span> Required fields are marked <span
+class="required">*</span></p><p
+class="comment-form-comment"><label
+for="comment">Comment</label><textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required="required"></textarea></p><p
+class="comment-form-author"><label
+for="author">Name <span
+class="required">*</span></label> <input
+id="author" name="author" type="text" value="" size="30" maxlength="245" required='required' /></p><p
+class="comment-form-email"><label
+for="email">Email <span
+class="required">*</span></label> <input
+id="email" name="email" type="text" value="" size="30" maxlength="100" aria-describedby="email-notes" required='required' /></p><p
+class="comment-form-cookies-consent"><input
+id="wp-comment-cookies-consent" name="wp-comment-cookies-consent" type="checkbox" value="yes" /><label
+for="wp-comment-cookies-consent">Save my name, email, and website in this browser for the next time I comment.</label></p><div
+class="gglcptch gglcptch_v2"><div
+id="gglcptch_recaptcha_1755056266" class="gglcptch_recaptcha"></div>
+<noscript><div
+style="width: 302px;"><div
+style="width: 302px; height: 422px; position: relative;"><div
+style="width: 302px; height: 422px; position: absolute;">
+<iframe
+src="https://www.google.com/recaptcha/api/fallback?k=6LeC4gQTAAAAADSMGWqvnLVeq46viKc5g6xO1yjU" frameborder="0" scrolling="no" style="width: 302px; height:422px; border-style: none;"></iframe></div></div><div
+style="border-style: none; bottom: 12px; left: 25px; margin: 0px; padding: 0px; right: 25px; background: #f9f9f9; border: 1px solid #c1c1c1; border-radius: 3px; height: 60px; width: 300px;"><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px !important; height: 40px !important; border: 1px solid #c1c1c1 !important; margin: 10px 25px !important; padding: 0px !important; resize: none !important;"></textarea></div></div>
+</noscript></div><p
+class="form-submit"><input
+name="submit" type="submit" id="submit" class="submit" value="Post Comment" /> <input
+type='hidden' name='comment_post_ID' value='97' id='comment_post_ID' />
+<input
+type='hidden' name='comment_parent' id='comment_parent' value='0' /></p><p
+style="display: none;"><input
+type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="912c251af7" /></p><p
+class="wysija-after-comment"><label
+for="wysija-box-after-comment"><input
+type="checkbox" id="wysija-box-after-comment" value="1" name="wysija[comment_subscribe]">Yes, add me to your mailing list.</label></p><p
+style="display: none;"><input
+type="hidden" id="ak_js" name="ak_js" value="134"/></p></form></div><p
+class="akismet_comment_form_privacy_notice">This site uses Akismet to reduce spam. <a
+href="https://akismet.com/privacy/" target="_blank">Learn how your comment data is processed</a>.</p></div><hr
+class="featurette-divider __after_loop">
+<nav
+id="nav-below" class="navigation" role="navigation"><h3 class="assistive-text">
+Post navigation</h3><ul
+class="pager"><li
+class="previous">
+<span
+class="nav-previous">
+<a
+href="http://www.sqlrelease.com/read-xml-data-as-a-table-in-sql-server" rel="prev" rel="nofollow">&larr; previous post</a>                    </span></li><li
+class="next">
+<span
+class="nav-next">
+<a
+href="http://www.sqlrelease.com/clustered-vs-nonclustered-indexes-when-to-choose-which-one" rel="next" rel="nofollow">next post &rarr;</a>                    </span></li></ul></nav></div><div
+class="span3 right tc-sidebar no-widget-icons"><div
+id="right" class="widget-area" role="complementary">
+<aside
+id="wgs_widget-2" class="widget widget_wgs_widget"><div
+class="wgs_wrapper"><div
+class="gcse-searchbox-only" data-resultsUrl="http://www.sqlrelease.com/search_gcse"></div></div></aside><aside
+id="wysija-7" class="widget widget_wysija"><h3 class="widget-title">Subscribe for newsletter</h3><div
+class="widget_wysija_cont"><div
+id="msg-form-wysija-7" class="wysija-msg ajax"></div><form
+id="form-wysija-7" method="post" action="#wysija" class="widget_wysija"><p
+class="wysija-paragraph">
+<label>Email <span
+class="wysija-required">*</span></label>
+<input
+type="text" name="wysija[user][email]" class="wysija-input validate[required,custom[email]]" title="Email"  value="" />
+<span
+class="abs-req">
+<input
+type="text" name="wysija[user][abs][email]" class="wysija-input validated[abs][email]" value="" />
+</span></p><input
+class="wysija-submit wysija-submit-field" type="submit" value="Subscribe!" /><input
+type="hidden" name="form_id" value="1" />
+<input
+type="hidden" name="action" value="save" />
+<input
+type="hidden" name="controller" value="subscribers" />
+<input
+type="hidden" value="1" name="wysija-page" />
+<input
+type="hidden" name="wysija[user_list][list_ids]" value="1" /></form></div></aside><aside
+id="wpsite_follow_us_badges-5" class="widget widget_wpsite_follow_us_badges"><h3 class="widget-title">Follow Us</h3><div
+class="wpsite_follow_us_div facebookbox"><div
+class="fb-like" data-href="https://facebook.com/sqlrelease" data-share="false" data-action="like" data-show-faces="false" data-layout="button_count" data-colorscheme="light"></div><div
+id="fb-root"></div> <script>(function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(d.getElementById(id))return;js=d.createElement(s);js.id=id;js.src="//connect.facebook.net/en_US/all.js#xfbml=1";fjs.parentNode.insertBefore(js,fjs);}(document,"script","facebook-jssdk"));</script></div><div
+class="wpsite_follow_us_div youtubebox"><div
+class="g-ytsubscribe" data-channelid="UCF4IvmVUzd7to5L87nn9fhw" data-layout="default" data-theme="default" data-count="1"></div><script src="https://apis.google.com/js/platform.js"></script></div><div
+class="wpsite_follow_us_div googlebox"><div
+class="g-follow" data-href="//plus.google.com/+sqlreleasepage" data-rel="publisher" data-annotation="bubble" data-height="20"></div> <script type="text/javascript">window.___gcfg={lang:"en-US"};(function(){var po=document.createElement("script");po.type="text/javascript";po.async=true;po.src="https://apis.google.com/js/platform.js";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(po,s);})();</script></div><div
+class="wpsite_follow_us_div twitterbox"><a
+href="https://twitter.com/ergkranjan" class="twitter-follow-button" data-show-count="true" data-dnt="false" data-show-screen-name="false" data-size="medium" data-lang="en" data-align="left" data-width="100%"></a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script></div>
+</aside><aside
+id="text-2" class="widget widget_text"><h3 class="widget-title">Available Tutorials</h3><div
+class="textwidget"><a
+href="http://www.sqlrelease.com/sql-server-tutorial/sql-server-tutorial-about">SQL Server Tutorial - Step By Step</a>
+<br/><br/>
+<i>Click on above link to know more about this tutorial series.</i></div>
+</aside><aside
+id="categories-2" class="widget widget_categories"><h3 class="widget-title">Categories</h3><ul><li
+class="cat-item cat-item-9"><a
+href="http://www.sqlrelease.com/category/net" >.NET</a> (4)<ul
+class='children'><li
+class="cat-item cat-item-10"><a
+href="http://www.sqlrelease.com/category/net/asp-net" >ASP.NET</a> (4)</li><li
+class="cat-item cat-item-11"><a
+href="http://www.sqlrelease.com/category/net/c" >C#</a> (4)</li></ul></li><li
+class="cat-item cat-item-130"><a
+href="http://www.sqlrelease.com/category/big-data" >Big Data</a> (10)<ul
+class='children'><li
+class="cat-item cat-item-132"><a
+href="http://www.sqlrelease.com/category/big-data/azure" >Azure</a> (3)</li><li
+class="cat-item cat-item-131"><a
+href="http://www.sqlrelease.com/category/big-data/hive" >Hive</a> (3)</li><li
+class="cat-item cat-item-123"><a
+href="http://www.sqlrelease.com/category/big-data/python" >Python</a> (7)</li></ul></li><li
+class="cat-item cat-item-86"><a
+href="http://www.sqlrelease.com/category/data-warehouse" >Data Warehouse</a> (3)</li><li
+class="cat-item cat-item-22"><a
+href="http://www.sqlrelease.com/category/msbi" >MSBI</a> (15)<ul
+class='children'><li
+class="cat-item cat-item-101"><a
+href="http://www.sqlrelease.com/category/msbi/power-bi" >Power BI</a> (3)</li><li
+class="cat-item cat-item-25"><a
+href="http://www.sqlrelease.com/category/msbi/ssas" >SSAS</a> (4)</li><li
+class="cat-item cat-item-24"><a
+href="http://www.sqlrelease.com/category/msbi/ssis" >SSIS</a> (5)</li><li
+class="cat-item cat-item-23"><a
+href="http://www.sqlrelease.com/category/msbi/ssrs" >SSRS</a> (4)</li></ul></li><li
+class="cat-item cat-item-3"><a
+href="http://www.sqlrelease.com/category/sql-server" >SQL Server</a> (85)<ul
+class='children'><li
+class="cat-item cat-item-31"><a
+href="http://www.sqlrelease.com/category/sql-server/performance-tuning" >Performance Tuning</a> (7)</li></ul></li><li
+class="cat-item cat-item-77"><a
+href="http://www.sqlrelease.com/category/sql-server-tutorial-for-beginners" >SQL Server Tutorial For Beginners</a> (11)</li><li
+class="cat-item cat-item-126"><a
+href="http://www.sqlrelease.com/category/tools" >Tools</a> (1)<ul
+class='children'><li
+class="cat-item cat-item-128"><a
+href="http://www.sqlrelease.com/category/tools/free-tools" >Free Tools</a> (1)</li></ul></li><li
+class="cat-item cat-item-112"><a
+href="http://www.sqlrelease.com/category/video-learning" >Video Learning</a> (8)<ul
+class='children'><li
+class="cat-item cat-item-113"><a
+href="http://www.sqlrelease.com/category/video-learning/unfolding-set-based-approach" >Unfolding | Set Based Approach</a> (8)</li></ul></li></ul>
+</aside><aside
+id="archives-2" class="widget widget_archive"><h3 class="widget-title">Archives</h3><ul><li><a
+href='http://www.sqlrelease.com/2018/05'>May 2018</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2018/04'>April 2018</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2018/03'>March 2018</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2018/02'>February 2018</a>&nbsp;(2)</li><li><a
+href='http://www.sqlrelease.com/2018/01'>January 2018</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2017/12'>December 2017</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2017/11'>November 2017</a>&nbsp;(3)</li><li><a
+href='http://www.sqlrelease.com/2017/10'>October 2017</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2017/09'>September 2017</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2017/08'>August 2017</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2017/07'>July 2017</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2017/06'>June 2017</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2017/05'>May 2017</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2017/04'>April 2017</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2017/03'>March 2017</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2017/02'>February 2017</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2017/01'>January 2017</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2016/12'>December 2016</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2016/11'>November 2016</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2016/10'>October 2016</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2016/09'>September 2016</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2016/08'>August 2016</a>&nbsp;(3)</li><li><a
+href='http://www.sqlrelease.com/2016/07'>July 2016</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2016/06'>June 2016</a>&nbsp;(7)</li><li><a
+href='http://www.sqlrelease.com/2016/05'>May 2016</a>&nbsp;(2)</li><li><a
+href='http://www.sqlrelease.com/2016/04'>April 2016</a>&nbsp;(2)</li><li><a
+href='http://www.sqlrelease.com/2016/03'>March 2016</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2016/02'>February 2016</a>&nbsp;(2)</li><li><a
+href='http://www.sqlrelease.com/2016/01'>January 2016</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2015/12'>December 2015</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2015/11'>November 2015</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2015/10'>October 2015</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2015/09'>September 2015</a>&nbsp;(3)</li><li><a
+href='http://www.sqlrelease.com/2015/08'>August 2015</a>&nbsp;(3)</li><li><a
+href='http://www.sqlrelease.com/2015/07'>July 2015</a>&nbsp;(7)</li><li><a
+href='http://www.sqlrelease.com/2015/06'>June 2015</a>&nbsp;(6)</li><li><a
+href='http://www.sqlrelease.com/2015/05'>May 2015</a>&nbsp;(6)</li><li><a
+href='http://www.sqlrelease.com/2015/04'>April 2015</a>&nbsp;(2)</li><li><a
+href='http://www.sqlrelease.com/2015/03'>March 2015</a>&nbsp;(2)</li><li><a
+href='http://www.sqlrelease.com/2015/02'>February 2015</a>&nbsp;(1)</li><li><a
+href='http://www.sqlrelease.com/2015/01'>January 2015</a>&nbsp;(3)</li><li><a
+href='http://www.sqlrelease.com/2014/12'>December 2014</a>&nbsp;(8)</li><li><a
+href='http://www.sqlrelease.com/2014/11'>November 2014</a>&nbsp;(9)</li><li><a
+href='http://www.sqlrelease.com/2014/10'>October 2014</a>&nbsp;(9)</li><li><a
+href='http://www.sqlrelease.com/2014/09'>September 2014</a>&nbsp;(21)</li></ul>
+</aside><aside
+id="tag_cloud-4" class="widget widget_tag_cloud"><h3 class="widget-title">Tags</h3><div
+class="tagcloud"><a
+href="http://www.sqlrelease.com/tag/block" class="tag-cloud-link tag-link-55 tag-link-position-1" style="font-size: 8pt;" aria-label="block (2 items)">block</a>
+<a
+href="http://www.sqlrelease.com/tag/case" class="tag-cloud-link tag-link-75 tag-link-position-2" style="font-size: 8pt;" aria-label="case (2 items)">case</a>
+<a
+href="http://www.sqlrelease.com/tag/checkpoints" class="tag-cloud-link tag-link-119 tag-link-position-3" style="font-size: 8pt;" aria-label="checkpoints (2 items)">checkpoints</a>
+<a
+href="http://www.sqlrelease.com/tag/cloud" class="tag-cloud-link tag-link-134 tag-link-position-4" style="font-size: 10pt;" aria-label="cloud (3 items)">cloud</a>
+<a
+href="http://www.sqlrelease.com/tag/clustered-index" class="tag-cloud-link tag-link-42 tag-link-position-5" style="font-size: 10pt;" aria-label="clustered index (3 items)">clustered index</a>
+<a
+href="http://www.sqlrelease.com/tag/coalesce" class="tag-cloud-link tag-link-6 tag-link-position-6" style="font-size: 8pt;" aria-label="coalesce (2 items)">coalesce</a>
+<a
+href="http://www.sqlrelease.com/tag/computed-column" class="tag-cloud-link tag-link-44 tag-link-position-7" style="font-size: 8pt;" aria-label="computed column (2 items)">computed column</a>
+<a
+href="http://www.sqlrelease.com/tag/constraint" class="tag-cloud-link tag-link-48 tag-link-position-8" style="font-size: 8pt;" aria-label="constraint (2 items)">constraint</a>
+<a
+href="http://www.sqlrelease.com/tag/count" class="tag-cloud-link tag-link-28 tag-link-position-9" style="font-size: 8pt;" aria-label="count (2 items)">count</a>
+<a
+href="http://www.sqlrelease.com/tag/cte" class="tag-cloud-link tag-link-20 tag-link-position-10" style="font-size: 8pt;" aria-label="cte (2 items)">cte</a>
+<a
+href="http://www.sqlrelease.com/tag/data-modelling" class="tag-cloud-link tag-link-91 tag-link-position-11" style="font-size: 10pt;" aria-label="data modeling (3 items)">data modeling</a>
+<a
+href="http://www.sqlrelease.com/tag/data-types" class="tag-cloud-link tag-link-76 tag-link-position-12" style="font-size: 8pt;" aria-label="data types (2 items)">data types</a>
+<a
+href="http://www.sqlrelease.com/tag/data-warehouse-designing" class="tag-cloud-link tag-link-90 tag-link-position-13" style="font-size: 10pt;" aria-label="data warehouse designing (3 items)">data warehouse designing</a>
+<a
+href="http://www.sqlrelease.com/tag/deadlock" class="tag-cloud-link tag-link-56 tag-link-position-14" style="font-size: 13pt;" aria-label="deadlock (5 items)">deadlock</a>
+<a
+href="http://www.sqlrelease.com/tag/dimension-types" class="tag-cloud-link tag-link-92 tag-link-position-15" style="font-size: 10pt;" aria-label="dimension types (3 items)">dimension types</a>
+<a
+href="http://www.sqlrelease.com/tag/dynamic-sql" class="tag-cloud-link tag-link-108 tag-link-position-16" style="font-size: 8pt;" aria-label="dynamic sql (2 items)">dynamic sql</a>
+<a
+href="http://www.sqlrelease.com/tag/execute" class="tag-cloud-link tag-link-70 tag-link-position-17" style="font-size: 8pt;" aria-label="execute (2 items)">execute</a>
+<a
+href="http://www.sqlrelease.com/tag/functions" class="tag-cloud-link tag-link-64 tag-link-position-18" style="font-size: 10pt;" aria-label="functions (3 items)">functions</a>
+<a
+href="http://www.sqlrelease.com/tag/hadoop" class="tag-cloud-link tag-link-136 tag-link-position-19" style="font-size: 10pt;" aria-label="Hadoop (3 items)">Hadoop</a>
+<a
+href="http://www.sqlrelease.com/tag/hdinsight" class="tag-cloud-link tag-link-133 tag-link-position-20" style="font-size: 10pt;" aria-label="HDInsight (3 items)">HDInsight</a>
+<a
+href="http://www.sqlrelease.com/tag/hiveql" class="tag-cloud-link tag-link-135 tag-link-position-21" style="font-size: 10pt;" aria-label="HiveQL (3 items)">HiveQL</a>
+<a
+href="http://www.sqlrelease.com/tag/index" class="tag-cloud-link tag-link-29 tag-link-position-22" style="font-size: 15pt;" aria-label="index (7 items)">index</a>
+<a
+href="http://www.sqlrelease.com/tag/indexing-techniques" class="tag-cloud-link tag-link-95 tag-link-position-23" style="font-size: 8pt;" aria-label="indexing techniques (2 items)">indexing techniques</a>
+<a
+href="http://www.sqlrelease.com/tag/joins" class="tag-cloud-link tag-link-18 tag-link-position-24" style="font-size: 8pt;" aria-label="joins (2 items)">joins</a>
+<a
+href="http://www.sqlrelease.com/tag/lock" class="tag-cloud-link tag-link-54 tag-link-position-25" style="font-size: 8pt;" aria-label="lock (2 items)">lock</a>
+<a
+href="http://www.sqlrelease.com/tag/new-features" class="tag-cloud-link tag-link-16 tag-link-position-26" style="font-size: 13pt;" aria-label="new features (5 items)">new features</a>
+<a
+href="http://www.sqlrelease.com/tag/nonclustered-index" class="tag-cloud-link tag-link-43 tag-link-position-27" style="font-size: 11.666666666667pt;" aria-label="nonclustered index (4 items)">nonclustered index</a>
+<a
+href="http://www.sqlrelease.com/tag/power-bi" class="tag-cloud-link tag-link-102 tag-link-position-28" style="font-size: 10pt;" aria-label="power bi (3 items)">power bi</a>
+<a
+href="http://www.sqlrelease.com/tag/python" class="tag-cloud-link tag-link-124 tag-link-position-29" style="font-size: 15pt;" aria-label="python (7 items)">python</a>
+<a
+href="http://www.sqlrelease.com/tag/python-use-case-sql" class="tag-cloud-link tag-link-125 tag-link-position-30" style="font-size: 13pt;" aria-label="python use case sql (5 items)">python use case sql</a>
+<a
+href="http://www.sqlrelease.com/tag/query-design" class="tag-cloud-link tag-link-99 tag-link-position-31" style="font-size: 8pt;" aria-label="query design (2 items)">query design</a>
+<a
+href="http://www.sqlrelease.com/tag/query-hint" class="tag-cloud-link tag-link-14 tag-link-position-32" style="font-size: 8pt;" aria-label="query hint (2 items)">query hint</a>
+<a
+href="http://www.sqlrelease.com/tag/reading-xml-data" class="tag-cloud-link tag-link-38 tag-link-position-33" style="font-size: 10pt;" aria-label="reading xml data (3 items)">reading xml data</a>
+<a
+href="http://www.sqlrelease.com/tag/recursive-cte" class="tag-cloud-link tag-link-15 tag-link-position-34" style="font-size: 10pt;" aria-label="recursive cte (3 items)">recursive cte</a>
+<a
+href="http://www.sqlrelease.com/tag/row-concatenation" class="tag-cloud-link tag-link-8 tag-link-position-35" style="font-size: 8pt;" aria-label="row concatenation (2 items)">row concatenation</a>
+<a
+href="http://www.sqlrelease.com/tag/set-based-approach" class="tag-cloud-link tag-link-7 tag-link-position-36" style="font-size: 22pt;" aria-label="set based approach (20 items)">set based approach</a>
+<a
+href="http://www.sqlrelease.com/tag/set-based-example" class="tag-cloud-link tag-link-114 tag-link-position-37" style="font-size: 17.333333333333pt;" aria-label="set based example (10 items)">set based example</a>
+<a
+href="http://www.sqlrelease.com/tag/sql-server-2016" class="tag-cloud-link tag-link-93 tag-link-position-38" style="font-size: 15pt;" aria-label="sql server 2016 (7 items)">sql server 2016</a>
+<a
+href="http://www.sqlrelease.com/tag/sql-server-2017" class="tag-cloud-link tag-link-122 tag-link-position-39" style="font-size: 16.666666666667pt;" aria-label="sql server 2017 (9 items)">sql server 2017</a>
+<a
+href="http://www.sqlrelease.com/tag/sql-server-tutorial-step-by-step" class="tag-cloud-link tag-link-78 tag-link-position-40" style="font-size: 18pt;" aria-label="sql server tutorial - step by step (11 items)">sql server tutorial - step by step</a>
+<a
+href="http://www.sqlrelease.com/tag/sql-tips" class="tag-cloud-link tag-link-110 tag-link-position-41" style="font-size: 14.166666666667pt;" aria-label="sql tips (6 items)">sql tips</a>
+<a
+href="http://www.sqlrelease.com/tag/ssms" class="tag-cloud-link tag-link-65 tag-link-position-42" style="font-size: 8pt;" aria-label="ssms (2 items)">ssms</a>
+<a
+href="http://www.sqlrelease.com/tag/step-by-step" class="tag-cloud-link tag-link-59 tag-link-position-43" style="font-size: 18.5pt;" aria-label="step by step (12 items)">step by step</a>
+<a
+href="http://www.sqlrelease.com/tag/temporal-table" class="tag-cloud-link tag-link-94 tag-link-position-44" style="font-size: 10pt;" aria-label="temporal table (3 items)">temporal table</a>
+<a
+href="http://www.sqlrelease.com/tag/xml" class="tag-cloud-link tag-link-37 tag-link-position-45" style="font-size: 11.666666666667pt;" aria-label="xml (4 items)">xml</a></div>
+</aside>		<aside
+id="recent-posts-2" class="widget widget_recent_entries"><h3 class="widget-title">Recent Posts</h3><ul><li>
+<a
+href="http://www.sqlrelease.com/python-use-case-import-zipped-file-without-unzipping-it-in-ssis-and-sql-server-sql-server-2017">Python use case &#8211; Import zipped file without unzipping it in SSIS and SQL Server &#8211; SQL Server 2017</a>
+<span
+class="post-date">May 31, 2018</span></li><li>
+<a
+href="http://www.sqlrelease.com/find-and-delete-all-duplicate-rows-but-keep-one">Find and Delete all duplicate rows but keep one</a>
+<span
+class="post-date">Apr 30, 2018</span></li><li>
+<a
+href="http://www.sqlrelease.com/import-csv-file-into-sql-server-using-t-sql-query">Import CSV file into SQL Server using T-SQL query</a>
+<span
+class="post-date">Mar 31, 2018</span></li><li>
+<a
+href="http://www.sqlrelease.com/python-use-case-convert-rows-into-comma-separated-values-in-a-column-sql-server-2017">Python use case &#8211; Convert rows into comma separated values in a column &#8211; SQL Server 2017</a>
+<span
+class="post-date">Feb 27, 2018</span></li><li>
+<a
+href="http://www.sqlrelease.com/python-use-case-dynamic-unpivot-using-pandas-sql-server-2017">Python use case &#8211; Dynamic UNPIVOT using pandas &#8211; SQL Server 2017</a>
+<span
+class="post-date">Feb 26, 2018</span></li></ul>
+</aside></div></div></div></div></div>
+<footer
+id="footer" class=""><div
+class="container footer-widgets  no-widget-icons"><div
+class="row widget-area" role="complementary"><div
+id="footer_one" class="span4">
+<aside
+id="wgs_widget-4" class="widget widget_wgs_widget"><div
+class="wgs_wrapper"><div
+class="gcse-searchbox-only" data-resultsUrl="http://www.sqlrelease.com/search_gcse"></div></div></aside></div><div
+id="footer_two" class="span4">
+<aside
+id="custommetawidget-8" class="widget customMetaWidget"><h3 class="widget-title">Users</h3><ul><li><a
+rel="nofollow" href="http://www.sqlrelease.com/wp-login.php">Log in</a></li></ul></aside></div><div
+id="footer_three" class="span4">
+<aside
+id="wysija-9" class="widget widget_wysija"><h3 class="widget-title">Subscribe for newsletter</h3><div
+class="widget_wysija_cont"><div
+id="msg-form-wysija-9" class="wysija-msg ajax"></div><form
+id="form-wysija-9" method="post" action="#wysija" class="widget_wysija"><p
+class="wysija-paragraph">
+<label>Email <span
+class="wysija-required">*</span></label>
+<input
+type="text" name="wysija[user][email]" class="wysija-input validate[required,custom[email]]" title="Email"  value="" />
+<span
+class="abs-req">
+<input
+type="text" name="wysija[user][abs][email]" class="wysija-input validated[abs][email]" value="" />
+</span></p><input
+class="wysija-submit wysija-submit-field" type="submit" value="Subscribe!" /><input
+type="hidden" name="form_id" value="1" />
+<input
+type="hidden" name="action" value="save" />
+<input
+type="hidden" name="controller" value="subscribers" />
+<input
+type="hidden" value="1" name="wysija-page" />
+<input
+type="hidden" name="wysija[user_list][list_ids]" value="1" /></form></div></aside></div></div></div><div
+class="colophon"><div
+class="container"><div
+class="row-fluid"><div
+class="span3 social-block pull-left"><span
+class="social-links"><a
+rel="nofollow" class="social-icon icon-feed"  title="Subscribe to my rss feed" aria-label="Subscribe to my rss feed" href="http://www.sqlrelease.com/feed/rss"  target="_blank" ><i
+class="fas fa-rss"></i></a><a
+rel="nofollow" class="social-icon icon-twitter"  title="Follow me on Twitter" aria-label="Follow me on Twitter" href="https://twitter.com/ergkranjan"  target="_blank" ><i
+class="fab fa-twitter"></i></a><a
+rel="nofollow" class="social-icon icon-facebook"  title="Follow me on Facebook" aria-label="Follow me on Facebook" href="https://www.facebook.com/sqlrelease"  target="_blank" ><i
+class="fab fa-facebook"></i></a><a
+rel="nofollow" class="social-icon icon-google"  title="Follow me on Google+" aria-label="Follow me on Google+" href="https://plus.google.com/+Sqlreleasepage"  target="_blank" ><i
+class="fab fa-google"></i></a><a
+rel="nofollow" class="social-icon icon-youtube"  title="Follow me on Youtube" aria-label="Follow me on Youtube" href="https://www.youtube.com/channel/UCF4IvmVUzd7to5L87nn9fhw"  target="_blank" ><i
+class="fab fa-youtube"></i></a><a
+rel="nofollow" class="social-icon icon-linkedin"  title="Follow me on LinkedIn" aria-label="Follow me on LinkedIn" href="http://in.linkedin.com/in/ergkranjan"  target="_blank" ><i
+class="fab fa-linkedin"></i></a></span></div><div
+class="span6 credits"><p>&middot; <span
+class="tc-copyright-text">&copy; 2018</span> <a
+href="http://www.sqlrelease.com" title="SQLRelease" rel="bookmark">SQLRelease</a> &middot; <span
+class="tc-wp-powered-text">Powered by</span> <a
+class="icon-wordpress" target="_blank" href="https://wordpress.org" title="Powered by WordPress"></a> &middot; <span
+class="tc-credits-text">Designed with the <a
+class="czr-designer-link" href="https://presscustomizr.com/customizr" title="Customizr theme">Customizr theme</a> </span> &middot;</p></div></div></div></div>
+</footer></div>
+ <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-54569823-1','auto');ga('send','pageview');</script>  <script>/*<![CDATA[*/(function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(d.getElementById(id))return;js=d.createElement(s);js.id=id;js.src="//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";fjs.parentNode.insertBefore(js,fjs);}(document,'script','facebook-jssdk'));/*]]>*/</script>  <script src="https://apis.google.com/js/platform.js" async defer></script>  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','twitter-wjs');</script> <script type='text/javascript'>var scriptParams={"google_search_engine_id":"009821497952709681419:ajtxrlpbgne"};</script> <script type="text/javascript" src="http://www.sqlrelease.com/wp-content/cache/minify/cf2c5.js?x43477"></script> <script type='text/javascript'>/*<![CDATA[*/var yasrCommonData={"postid":"97","ajaxurl":"http:\/\/www.sqlrelease.com\/wp-admin\/admin-ajax.php","loggedUser":"","visitorStatsEnabled":"yes","tooltipValues":["bad","poor","ok","good","super"],"loaderHtml":"<div id=\"loader-visitor-rating\" >\u00a0 Loading, please wait <img src=http:\/\/www.sqlrelease.com\/wp-content\/plugins\/yet-another-stars-rating\/img\/loader.gif title=\"yasr-loader\" alt=\"yasr-loader\"><\/div>"};var yasrVisitorsVotesData={"nonceVisitor":"7e9f1d99a4"};/*]]>*/</script> <script type="text/javascript" src="http://www.sqlrelease.com/wp-content/cache/minify/1b04c.js?x43477"></script> <script type='text/javascript'>var wysijaAJAX={"action":"wysija_ajax","controller":"subscribers","ajaxurl":"http:\/\/www.sqlrelease.com\/wp-admin\/admin-ajax.php","loadingTrans":"Loading...","is_rtl":""};</script> <script type="text/javascript" src="http://www.sqlrelease.com/wp-content/cache/minify/3cf12.js?x43477"></script> <script type='text/javascript'>var dwpb={"timeleft":"-1528147143","reset_cookie":"3"};</script> <script type="text/javascript" src="http://www.sqlrelease.com/wp-content/cache/minify/c194f.js?x43477"></script> <script type='text/javascript'>var gglcptch_pre={"messages":{"in_progress":"Please wait until Google reCAPTCHA is loaded.","timeout":"Failed to load Google reCAPTCHA. Please check your internet connection and reload this page."},"custom_callback":""};</script> <script type="text/javascript" src="http://www.sqlrelease.com/wp-content/cache/minify/e04ff.js?x43477"></script> <script type='text/javascript' data-cfasync="false" async="async" defer="defer" src='https://www.google.com/recaptcha/api.js?onload=gglcptch_onload_callback&#038;render=explicit&#038;ver=1.36'></script> <script type='text/javascript'>/*<![CDATA[*/var gglcptch={"options":{"version":"v2","sitekey":"6LeC4gQTAAAAADSMGWqvnLVeq46viKc5g6xO1yjU","theme":"light","error":"<strong>Warning<\/strong>:&nbsp;More than one reCAPTCHA has been found in the current form. Please remove all unnecessary reCAPTCHA fields to make it work properly."},"vars":{"visibility":false}};/*]]>*/</script> <script type="text/javascript" src="http://www.sqlrelease.com/wp-content/cache/minify/b3df2.js?x43477"></script> <style>@font-face{font-family:"0";src:url('')}#dwpb{font-family:0}#dwpb,.dwpb-action{background-color:#f9572f}#dwpb, .dwpb-action, body.dwpb-allow-close.dwpb-open .dwpb-close{color:#fff}#dwpb{font-size:16px}#dwpb{border-width:0}#dwpb a{color:#fff}#dwpb .dwpb-button{background-color:#333}</style><div
+id="dwpb" class=" fixtop "><div
+class="dwpb-inner"><div
+class="dwpb-message hide">
+<span
+class="dwpb-content">Must Watch - Set Based Approach Video Series - It will change the way you think while writing SQL Queries</span>
+<a
+class="dwpb-button" href="https://youtu.be/CWrR6U9n-8E?list=PLXnB3oRMZvrANuRjnzPOtxIuIwNWNdbjM " target="_blank"" >Watch Now</a></div><div
+class="dwpb-countdown "><div
+class="dwpb-counter"></div>
+<span
+class="dwpbcd-content">Probably the best series to learn - Set Based Approach. Must Watch. It will change the way you think while writing SQL Queries.</span>
+<a
+class="dwpb-button" href="https://youtu.be/CWrR6U9n-8E?list=PLXnB3oRMZvrANuRjnzPOtxIuIwNWNdbjM " target="_self"" >Watch Now</a></div></div></div>
+<span
+class="dwpb-action"></span><div
+id="tc-footer-btt-wrapper" class="tc-btt-wrapper right"><i
+class="btt-arrow"></i></div></body></html>

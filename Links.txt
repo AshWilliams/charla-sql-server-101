@@ -1,0 +1,22 @@
+http://sqlblog.com/blogs/paul_white/archive/2012/04/28/query-optimizer-deep-dive-part-1.aspx
+
+
+Logical Processing Order of the SELECT statement
+The following steps show the logical processing order, or binding order, for a SELECT statement. 
+This order determines when the objects defined in one step are made available to the clauses in subsequent steps. 
+For example, if the query processor can bind to (access) the tables or views defined in the FROM clause, 
+these objects and their columns are made available to all subsequent steps. Conversely, because the SELECT clause is step 8, 
+any column aliases or derived columns defined in that clause cannot be referenced by preceding clauses. However, they can be referenced 
+by subsequent clauses such as the ORDER BY clause. The actual physical execution of the statement is determined by the query processor and the order may vary from this list.
+
+FROM
+ON
+JOIN
+WHERE
+GROUP BY
+WITH CUBE or WITH ROLLUP
+HAVING
+SELECT
+DISTINCT
+ORDER BY
+TOP
